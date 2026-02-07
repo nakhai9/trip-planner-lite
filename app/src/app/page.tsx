@@ -136,7 +136,7 @@ export default function Home() {
                 <Tooltip title="Xem chi tiết">
                   <button
                     onClick={viewDetails}
-                    className="flex items-center gap-2 bg-white hover:bg-amber-50 px-4 border border-amber-500 rounded-md h-10 text-amber-500 hover:text-amber-600 text-xs md:text-sm cursor-pointer icon"
+                    className="hidden flex items-center gap-2 bg-white hover:bg-amber-50 px-4 border border-amber-500 rounded-md h-10 text-amber-500 hover:text-amber-600 text-xs md:text-sm cursor-pointer icon"
                   >
                     Xem chi tiết
                   </button>
