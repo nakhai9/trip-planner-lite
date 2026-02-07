@@ -76,7 +76,7 @@ export default function Home() {
     const formData = new FormData();
     formData.append("file", blob, "vietnam-map.svg");
 
-    const res = await fetch(process.env.NEXT_PUBLIC_API_URL || "", {
+    const res = await fetch("https://govietnam.onrender.com", {
       method: "POST",
       body: formData,
     });
