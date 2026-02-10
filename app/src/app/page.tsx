@@ -20,8 +20,9 @@ import { useVietnamMapStore } from "./store/vietnam-map-store";
 import clsx from "clsx";
 import { useRouter } from "next/navigation";
 import SocialShare from "./components/SocialShare";
-import { useGlobalStore } from "./store/global-store";
+import { useGlobalStore, useToast } from "./store/global-store";
 import MainLayout from "./ui/layout/MainLayout";
+import { API_URLS } from "./common/api.constant";
 
 export default function Home() {
   const [location, setLocation] = React.useState<LocationInfo | null>(null);
@@ -31,6 +32,7 @@ export default function Home() {
   const [modalName, setModalName] = React.useState<string | null>(null);
   const router = useRouter();
   const { setIsLoading, setConfiguration } = useGlobalStore();
+  const { showError } = useToast();
 
   const {
     switchToMap,
@@ -81,7 +83,7 @@ export default function Home() {
     const formData = new FormData();
     formData.append("file", blob, "vietnam-map.svg");
 
-    const res = await fetch("https://govietnam.onrender.com/api/upload", {
+    const res = await fetch(API_URLS.upload, {
       method: "POST",
       body: formData,
     });
@@ -94,9 +96,16 @@ export default function Home() {
   const onShareModal = async () => {
     setIsLoading(true);
     setConfiguration({ description: "Đang tạo hình ảnh để chia sẻ" });
-    await uploadImages();
-    setModalName("share-modal");
-    setOpen(true);
+    try {
+      await uploadImages();
+      setModalName("share-modal");
+      setOpen(true);
+    } catch (error) {
+      console.log(error);
+      showError("Không thể thực hiện thao tác này");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const openMarkModal = () => {
@@ -147,21 +156,21 @@ export default function Home() {
               className="w-4 h-4"
               style={{ backgroundColor: "#BB4D00" }}
             ></div>
-            <span className="text-xs md:text-sm">Đã đến</span>
+            <span className="text-gray-600 text-xs md:text-sm">Đã đến</span>
           </div>
           <div className="flex items-center gap-1">
             <div
               className="w-4 h-4"
               style={{ backgroundColor: "#836FFF" }}
             ></div>
-            <span className="text-xs md:text-sm">Sắp đến</span>
+            <span className="text-gray-600 text-xs md:text-sm">Sắp đến</span>
           </div>
           <div className="flex items-center gap-1">
             <div
               className="w-4 h-4"
               style={{ backgroundColor: "#FE9A00" }}
             ></div>
-            <span className="text-xs md:text-sm">Chưa đến</span>
+            <span className="text-gray-600 text-xs md:text-sm">Chưa đến</span>
           </div>
         </div>
       </div>
@@ -177,14 +186,18 @@ export default function Home() {
                   Xem chi tiết
                 </button>
               </Tooltip>
-              <Tooltip title="Tạo lịch trình">
-                <button
-                  onClick={navigateToCreateTravelPlan}
-                  className="flex items-center gap-2 bg-amber-600 hover:bg-amber-500 px-4 rounded-md h-8 md:h-10 text-white text-xs md:text-sm cursor-pointer"
-                >
-                  <MapPinned className="w-4 md:w-5 h-4 md:h-5" /> Tạo lịch trình
-                </button>
-              </Tooltip>
+              {selectedLocations.filter((x) => x.status === "UPCOMING").length >
+                0 && (
+                <Tooltip title="Tạo lịch trình">
+                  <button
+                    onClick={navigateToCreateTravelPlan}
+                    className="flex items-center gap-2 bg-amber-600 hover:bg-amber-500 px-4 rounded-md h-8 md:h-10 text-white text-xs md:text-sm cursor-pointer"
+                  >
+                    <MapPinned className="w-4 md:w-5 h-4 md:h-5" /> Tạo lịch
+                    trình
+                  </button>
+                </Tooltip>
+              )}
               <Tooltip title="Tạo hình ảnh để chia sẻ">
                 <button
                   onClick={onShareModal}
@@ -224,7 +237,7 @@ export default function Home() {
         </div>
         <div className="p-5 min-w-56">
           {modalName === "mark-modal" && (
-            <div className="w-56 md:w-64">
+            <div className="w-48 md:w-64">
               <div className="mb-4 font-medium text-2xl text-center">
                 {location?.name ?? "-"}
               </div>

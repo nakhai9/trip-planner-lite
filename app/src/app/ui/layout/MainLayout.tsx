@@ -1,28 +1,27 @@
 "use client";
 
 import Modal from "@/app/components/Modal";
-import { useGlobalStore } from "@/app/store/global-store";
+import { useGlobalStore, useToast } from "@/app/store/global-store";
 import { useVietnamMapStore } from "@/app/store/vietnam-map-store";
-import { Backdrop, CircularProgress } from "@mui/material";
+import { Alert, Backdrop, CircularProgress, Snackbar } from "@mui/material";
 import clsx from "clsx";
 import { Map, MapPinned } from "lucide-react";
+import Toast from "../toast";
 
 type MainLayoutProps = {
   children: React.ReactNode;
+  hideButton?: boolean;
 };
 
-export default function MainLayout({ children }: MainLayoutProps) {
+export default function MainLayout({
+  children,
+  hideButton = false,
+}: MainLayoutProps) {
   const { isLoading, description, setIsLoading, setConfiguration } =
     useGlobalStore();
+  const { message, isShow, type, hideToast } = useToast();
   const open = false;
-  const {
-    switchToMap,
-    updateSelectedLocations,
-    resetMap,
-    currentMap,
-    isNewMap,
-    selectedLocations,
-  } = useVietnamMapStore();
+  const { switchToMap, isNewMap, selectedLocations } = useVietnamMapStore();
 
   const onSwitchToMap = () => {
     setIsLoading(true);
@@ -38,47 +37,30 @@ export default function MainLayout({ children }: MainLayoutProps) {
             GoVietnam
           </h1>
           <div className="flex gap-4">
-            {!selectedLocations.length && (
-              <button
-                className={clsx(
-                  "hidden md:flex items-center gap-2 hover:bg-amber-50 px-4 border border-amber-600 rounded-md h-10 text-amber-600 text-xs md:text-sm icon",
-                  selectedLocations.length > 0
-                    ? "opacity-50 cursor-not-allowed"
-                    : "cursor-pointer",
+            {!hideButton && (
+              <>
+                {!selectedLocations.length && (
+                  <button
+                    className={clsx(
+                      "flex items-center gap-2 hover:bg-amber-50 px-4 border border-amber-600 rounded-md h-8 md:h-10 text-amber-600 text-xs md:text-sm icon",
+                      selectedLocations.length > 0
+                        ? "opacity-50 cursor-not-allowed"
+                        : "cursor-pointer",
+                    )}
+                    type="button"
+                    onClick={onSwitchToMap}
+                    disabled={selectedLocations.length > 0}
+                  >
+                    <Map className="w-4 md:w-5 h-4 md:h-5" />
+                    <p>Xem bản đồ {isNewMap ? "mới" : "cũ"}</p>
+                  </button>
                 )}
-                type="button"
-                onClick={onSwitchToMap}
-                disabled={selectedLocations.length > 0}
-              >
-                <Map />
-                <p>
-                  Xem bản đồ{" "}
-                  <span className="font-semibold">
-                    {isNewMap ? "trước" : "sau"}
-                  </span>{" "}
-                  sáp nhập
-                </p>
-              </button>
-            )}
-            {!selectedLocations.length && (
-              <button
-                className={clsx(
-                  "md:hidden flex items-center gap-2 hover:bg-amber-50 px-4 border border-amber-600 rounded-md h-8 md:h-10 text-amber-600 text-xs md:text-sm icon",
-                  selectedLocations.length > 0
-                    ? "opacity-50 cursor-not-allowed"
-                    : "cursor-pointer",
-                )}
-                type="button"
-                onClick={onSwitchToMap}
-                disabled={selectedLocations.length > 0}
-              >
-                <MapPinned size={20} /> Chuyển bản đồ
-              </button>
+              </>
             )}
           </div>
         </div>
       </div>
-      <main className="mx-auto mt-8 w-full md:w-5xl">{children}</main>
+      <main className="mx-auto mt-5 w-full md:w-5xl">{children}</main>
       {open && <Modal />}
       <Backdrop
         sx={{
@@ -93,6 +75,12 @@ export default function MainLayout({ children }: MainLayoutProps) {
           )}
         </div>
       </Backdrop>
+      <Toast
+        isShow={isShow}
+        message={message}
+        type={type}
+        onClose={hideToast}
+      />
     </div>
   );
 }

@@ -49,7 +49,6 @@ export default function MapViewer({
           </TransformComponent>
         )}
       </TransformWrapper> */}
-
       <VietnamMap
         locations={locations}
         onClick={(location) => handleChooseProvince(location)}
