@@ -186,7 +186,7 @@ export default function Home() {
                   Xem chi tiết
                 </button>
               </Tooltip>
-              {selectedLocations.filter((x) => x.status === "UPCOMING").length >
+              /* {selectedLocations.filter((x) => x.status === "UPCOMING").length >
                 0 && (
                 <Tooltip title="Tạo lịch trình">
                   <button
@@ -197,7 +197,7 @@ export default function Home() {
                     trình
                   </button>
                 </Tooltip>
-              )}
+              )} */
               <Tooltip title="Tạo hình ảnh để chia sẻ">
                 <button
                   onClick={onShareModal}
