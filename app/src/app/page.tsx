@@ -28,20 +28,13 @@ export default function Home() {
   const [location, setLocation] = React.useState<LocationInfo | null>(null);
   const [open, setOpen] = React.useState(false);
   const [url, setUrl] = React.useState("https://example.com");
-  const [isViewDetails, setIsViewDetails] = React.useState(false);
   const [modalName, setModalName] = React.useState<string | null>(null);
   const router = useRouter();
-  const { setIsLoading, setConfiguration } = useGlobalStore();
+  const { setIsLoading } = useGlobalStore();
   const { showError } = useToast();
 
-  const {
-    switchToMap,
-    updateSelectedLocations,
-    resetMap,
-    currentMap,
-    isNewMap,
-    selectedLocations,
-  } = useVietnamMapStore();
+  const { updateSelectedLocations, resetMap, currentMap, selectedLocations } =
+    useVietnamMapStore();
 
   const handleChooseLocation = (location: LocationInfo) => {
     openMarkModal();
@@ -94,14 +87,12 @@ export default function Home() {
   };
 
   const onShareModal = async () => {
-    setIsLoading(true);
-    setConfiguration({ description: "Đang tạo hình ảnh để chia sẻ" });
+    setIsLoading(true, "Đang tạo hình ảnh để chia sẻ");
     try {
       await uploadImages();
       setModalName("share-modal");
       setOpen(true);
     } catch (error) {
-      console.log(error);
       showError("Không thể thực hiện thao tác này");
     } finally {
       setIsLoading(false);
@@ -191,7 +182,7 @@ export default function Home() {
                 <Tooltip title="Tạo lịch trình">
                   <button
                     onClick={navigateToCreateTravelPlan}
-                    className="hidden items-center gap-2 bg-amber-600 hover:bg-amber-500 px-4 rounded-md h-8 md:h-10 text-white text-xs md:text-sm cursor-pointer"
+                    className="flex items-center gap-2 bg-amber-600 hover:bg-amber-500 px-4 rounded-md h-8 md:h-10 text-white text-xs md:text-sm cursor-pointer"
                   >
                     <MapPinned className="w-4 md:w-5 h-4 md:h-5" /> Tạo lịch
                     trình

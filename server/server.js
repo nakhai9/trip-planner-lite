@@ -3,6 +3,7 @@ const express = require("express");
 const cors = require("cors");
 
 const uploadRouter = require("./routes/upload");
+const planRouter = required("./routes/plan");
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.get("/api/hello", (req, res) => {
 });
 
 app.use("/api/upload/", uploadRouter);
+app.use("/api/plans", planRouter)
 
 
 // Start server

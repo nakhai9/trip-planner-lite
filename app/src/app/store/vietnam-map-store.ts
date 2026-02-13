@@ -38,7 +38,6 @@ export const useVietnamMapStore = create<VietnamMapStore>((set) => ({
     })),
   updateSelectedLocations: (location: LocationInfo) =>
     set((state) => {
-      console.log("Updating location:", location);
       const existingLoc = state.selectedLocations.find(
         (x) => x.codeName === location.codeName,
       );

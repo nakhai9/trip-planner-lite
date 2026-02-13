@@ -2,21 +2,16 @@ import { create } from "zustand";
 
 type GlobalStore = {
   isLoading: boolean;
-  description?: string;
   isShowToast: boolean;
-  setIsLoading: (loading: boolean) => void;
-  setConfiguration: (config: {
-    description: string;
-    [key: string]: string;
-  }) => void;
+  loadingMessage?: string;
+  setIsLoading: (loading: boolean, message?: string) => void;
 };
 export const useGlobalStore = create<GlobalStore>((set) => ({
   isLoading: false,
-  description: undefined,
   isShowToast: false,
-  message: "",
-  setIsLoading: (loading: boolean) => set({ isLoading: loading }),
-  setConfiguration: (config) => set(config),
+  loadingMessage: "",
+  setIsLoading: (loading: boolean, message?: string) =>
+    set({ isLoading: loading, loadingMessage: message }),
 }));
 
 type ToastStore = {
