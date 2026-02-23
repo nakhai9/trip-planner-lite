@@ -27,7 +27,7 @@ export default function ChiaSeHinhAnh() {
   const [modalName, setModalName] = React.useState<string | null>(null);
   const router = useRouter();
   const { setIsLoading } = useGlobalStore();
-  const { showError } = useToast();
+  const { showError, showInfo } = useToast();
 
   const { updateSelectedLocations, resetMap, currentMap, selectedLocations } =
     useVietnamMapStore();
@@ -57,7 +57,7 @@ export default function ChiaSeHinhAnh() {
     const svgElement = document.getElementById("vietnam-map-svg");
 
     if (!svgElement) {
-      alert("Không tìm thấy bản đồ SVG");
+      showInfo("Không tìm thấy bản đồ SVG");
       return;
     }
 
@@ -139,7 +139,8 @@ export default function ChiaSeHinhAnh() {
                   onClick={onShareModal}
                   className="flex items-center gap-2 bg-amber-600 hover:bg-amber-500 px-4 rounded-md h-8 md:h-10 text-white text-xs md:text-sm cursor-pointer"
                 >
-                  <Share2 className="w-4 md:w-5 h-4 md:h-5" /> Chia sẻ
+                  <Share2 className="w-4 md:w-5 h-4 md:h-5" /> Chia sẻ lên mạng
+                  xã hội
                 </button>
               </Tooltip>
               <Tooltip title="Khôi phục">

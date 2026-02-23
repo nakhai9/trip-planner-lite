@@ -63,7 +63,7 @@ export default function PlanDetailsPage({}: PlanDetailsProps) {
 
         {qrCodeUrl && (
           <div className="flex justify-center items-center px-4 md:px-0">
-            <h4 className="text-gray-700 text-center">
+            <h4 className="text-gray-700 text-xs text-center">
               Hãy gởi bạn bè của bạn mã QR này để họ dễ dàng theo dõi lịch trình
             </h4>
             <img
