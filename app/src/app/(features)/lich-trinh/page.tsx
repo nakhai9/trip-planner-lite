@@ -133,7 +133,7 @@ export default function TravelPlan() {
   }, [currentStep]);
 
   useEffect(() => {
-    if (currentStep === 1) {
+    if (!plan) {
       initPlan();
     }
     if (currentStep === 2) {
@@ -228,19 +228,18 @@ export default function TravelPlan() {
                 onChange={(e) => onNamePlanChange(e)}
                 value={plan?.title || ""}
               />
-            </div>
-
-            {plan?.title && (
-              <div className="flex justify-end">
-                <button
-                  type="button"
-                  onClick={() => handleNextStep(2)}
-                  className="flex items-center gap-2 bg-amber-600 hover:bg-amber-500 px-4 rounded-md h-8 md:h-10 text-white text-xs md:text-sm cursor-pointer"
-                >
-                  Tiếp theo
-                </button>
+              <div className="flex justify-end mt-2">
+                {currentStep === 1 && plan?.title && (
+                  <button
+                    type="button"
+                    onClick={() => handleNextStep(2)}
+                    className="flex items-center gap-2 bg-amber-600 hover:bg-amber-500 px-4 rounded-md h-8 md:h-10 text-white text-xs md:text-sm cursor-pointer"
+                  >
+                    Tiếp theo
+                  </button>
+                )}
               </div>
-            )}
+            </div>
           </div>
         )}
 
@@ -280,18 +279,6 @@ export default function TravelPlan() {
                   ))}
               </div>
             )}
-
-            {!!selectedLocations.length && plan?.title && (
-              <div className="flex justify-end">
-                <button
-                  type="button"
-                  onClick={() => handleNextStep(3)}
-                  className="flex items-center gap-2 bg-amber-600 hover:bg-amber-500 px-4 rounded-md h-8 md:h-10 text-white text-xs md:text-sm cursor-pointer"
-                >
-                  Tiếp theo
-                </button>
-              </div>
-            )}
           </div>
         )}
 
@@ -329,7 +316,14 @@ export default function TravelPlan() {
             </div>
 
             {!!plan?.destinations.length && (
-              <div className="flex justify-end my-3">
+              <div className="flex justify-between my-3">
+                <button
+                  type="button"
+                  onClick={() => handleNextStep(2)}
+                  className="flex items-center gap-2 bg-amber-600 hover:bg-amber-500 px-4 rounded-md h-8 md:h-10 text-white text-xs md:text-sm cursor-pointer"
+                >
+                  Quay lại
+                </button>
                 <Tooltip title="Tạo lịch trình">
                   <button
                     type="button"
@@ -343,6 +337,28 @@ export default function TravelPlan() {
             )}
           </div>
         )}
+
+        <div className={clsx("flex justify-between items-center mt-2 actions")}>
+          {currentStep === 2 && plan?.title && (
+            <button
+              type="button"
+              onClick={() => handleNextStep(1)}
+              className="flex items-center gap-2 bg-amber-600 hover:bg-amber-500 px-4 rounded-md h-8 md:h-10 text-white text-xs md:text-sm cursor-pointer"
+            >
+              Quay lại
+            </button>
+          )}
+
+          {currentStep === 2 && !!selectedLocations.length && plan?.title && (
+            <button
+              type="button"
+              onClick={() => handleNextStep(3)}
+              className="flex items-center gap-2 bg-amber-600 hover:bg-amber-500 px-4 rounded-md h-8 md:h-10 text-white text-xs md:text-sm cursor-pointer"
+            >
+              Tiếp theo
+            </button>
+          )}
+        </div>
       </div>
     </MainLayout>
   );
