@@ -1,5 +1,5 @@
 @import "tailwindcss";
-
+@import url("https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Manrope:wght@200..800&display=swap");
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -22,9 +22,8 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Montserrat, sans-serif !important;
+  font-family: "Manrope", sans-serif !important;
 }
-
 
 g:hover {
   fill: #fef3c6 !important;

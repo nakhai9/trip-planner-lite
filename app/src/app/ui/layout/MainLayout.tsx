@@ -31,12 +31,12 @@ export default function MainLayout({
   return (
     <div className="relative flex flex-col min-h-screen font-sans">
       <div className="top-0 left-0 z-50 fixed flex bg-white shadow-md w-full">
-        <div className="flex justify-center md:justify-between items-center bg-white mx-auto px-4 md:px-0 w-full md:w-5xl h-14 cursor-pointer">
+        <div className="flex justify-center md:justify-between items-center gap-4 bg-white mx-auto px-4 md:px-0 w-full md:w-5xl h-14 cursor-pointer">
           <h1
             onClick={() => router.push("/")}
             className="block bg-amber-600 p-2 md:px-2 md:py-0 font-medium text-white text-xl md:text-3xl md:text-left text-center italic"
           >
-            GoVietnam
+            AroundVietnam
           </h1>
           {!hideButton && (
             <div className="flex gap-4">
@@ -60,7 +60,7 @@ export default function MainLayout({
           )}
         </div>
       </div>
-      <main className="mx-auto mt-10 w-full md:w-5xl">{children}</main>
+      <main className="mx-auto w-full md:w-5xl">{children}</main>
       {open && <Modal />}
       <Backdrop
         sx={{

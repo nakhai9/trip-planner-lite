@@ -10,3 +10,11 @@ export type LocationModel = {
   codeName: string;
   svgData: string;
 };
+
+export type Province = {
+  id: string;
+  codeName: string;
+  name: string;
+  mergedInto: string;
+  isMerged?: boolean;
+};

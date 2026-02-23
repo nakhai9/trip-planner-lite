@@ -21,6 +21,7 @@ type ToastStore = {
   hideToast: () => void;
   showSuccess: (message: string) => void;
   showError: (message: any) => void;
+  showInfo: (message: string) => void;
 };
 export const useToast = create<ToastStore>((set) => ({
   isShow: false,
@@ -38,4 +39,11 @@ export const useToast = create<ToastStore>((set) => ({
       type: "error",
       isShow: true,
     }),
+  showInfo: (message: string) => {
+    set({
+      message,
+      type: "warning",
+      isShow: true,
+    });
+  },
 }));

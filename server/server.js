@@ -1,17 +1,24 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const bodyParser = require("body-parser")
+
+const connectDB = require("./configs/mongodbConfig");
 
 const uploadRouter = require("./routes/upload");
-const planRouter = required("./routes/plan");
+const planRouter = require("./routes/plan");
+const provinceRouter = require("./routes/province")
 
 const app = express();
 
 // Middleware parse JSON
 app.use(express.json());
 app.use(cors());
-app.use(express.json());
 
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+connectDB()
 // Route test
 app.get("/", (req, res) => {
     res.send("Server Node.js đang chạy 🚀");
@@ -23,7 +30,9 @@ app.get("/api/hello", (req, res) => {
 });
 
 app.use("/api/upload/", uploadRouter);
-app.use("/api/plans", planRouter)
+app.use("/api/plan", planRouter);
+app.use('/api/provinces', provinceRouter)
+
 
 
 // Start server

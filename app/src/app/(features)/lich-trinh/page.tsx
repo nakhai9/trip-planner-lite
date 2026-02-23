@@ -1,106 +1,76 @@
 "use client";
 
-import React from "react";
-import { Tooltip } from "@mui/material";
+import React, { useCallback, useEffect, useState } from "react";
+import {
+  Autocomplete,
+  Box,
+  Chip,
+  MenuItem,
+  OutlinedInput,
+  Select,
+  SelectChangeEvent,
+  TextField,
+  Tooltip,
+} from "@mui/material";
 import { Bot, CirclePlus, MapPin, Trash, Trash2, X } from "lucide-react";
 
 import { useVietnamMapStore } from "@/app/store/vietnam-map-store";
 import MainLayout from "@/app/ui/layout/MainLayout";
 import { GeminiService } from "@/app/services/gemini";
 import { useGlobalStore, useToast } from "@/app/store/global-store";
-import { Utils } from "@/app/common/utils";
-import { LocationInfo } from "@/app/model";
+import { LocationInfo, Province } from "@/app/model";
+
+import { useRouter } from "next/navigation";
+import Tabs, { Tab } from "@/app/ui/tab";
+import { HttpClient } from "@/app/libs/api/axios";
+import { API_URLS } from "@/app/libs/api/api.constant";
+import { Utils } from "@/app/libs/utils";
+import clsx from "clsx";
+import DestinationItem, { Destination } from "@/app/components/Destination";
+import { ResponseId } from "@/app/libs/api/api.models";
+
+type Schedule = {
+  day: number;
+  destinations: Destination[];
+};
 
 type Plan = {
   title?: string;
   startAt?: string;
   description?: string;
-  locations: {
-    locationName: string;
-    activities: string[];
-  }[];
+  destinations: Destination[];
 };
 
 export default function TravelPlan() {
-  const { selectedLocations, updateSelectedLocations } = useVietnamMapStore();
-  const { isLoading, setIsLoading } = useGlobalStore();
+  const router = useRouter();
+  const { selectedLocations, updateSelectedLocations, resetMap } =
+    useVietnamMapStore();
+  const { setIsLoading } = useGlobalStore();
   const { showError } = useToast();
+  const [currentStep, setCurrentStep] = useState<number>(1);
+  const [plan, setPlan] = useState<Plan | null>(null);
 
-  const [plan, setPlan] = React.useState<Plan>({
-    title: "demo",
-    locations: [],
-  });
+  const [provinces, setProvinces] = useState<Province[]>([]);
 
-  // lưu input theo từng location
-  const [inputs, setInputs] = React.useState<Record<string, string>>({});
-
-  const onChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    codeName: string,
-  ) => {
-    setInputs((prev) => ({
-      ...prev,
-      [codeName]: e.target.value,
-    }));
-  };
-
-  const onAdd = (codeName: string) => {
-    const action = inputs[codeName]?.trim();
-    if (!action) return;
-    setPlan((prev: Plan) => {
-      const existed = prev.locations.find((m) => m.locationName === codeName);
-      if (existed) {
-        return {
-          ...prev,
-          locations: prev.locations.map((m) =>
-            m.locationName === codeName
-              ? {
-                  ...m,
-                  activities: [...m.activities, action],
-                }
-              : m,
-          ),
-        };
-      }
-      return {
-        ...prev,
-        locations: [
-          ...prev.locations,
-          {
-            locationName: codeName,
-            activities: [action],
-          },
-        ],
-      };
-    });
-    // clear input sau khi add
-    setInputs((prev) => ({ ...prev, [codeName]: "" }));
-  };
-
-  const onDelete = (codeName: string, action: string) => {
-    setPlan((prev) => ({
-      ...prev,
-      locations: prev.locations.map((m) =>
-        m.locationName === codeName
-          ? {
-              ...m,
-              actionsAtLocation: m.activities.filter((a) => a !== action),
-            }
-          : m,
-      ),
-    }));
+  const navigateToPage = (url?: string) => {
+    if (!url) return;
+    router.push(url);
   };
 
   const askGeminiToCreatePlan = async () => {
-    setIsLoading(true, "Vui lòng chờ một chút, đề xuất đang được tạo...");
+    setIsLoading(true, "Gemini đang tìm kiếm những gợi ý phù hợp...");
     try {
-      const data = await GeminiService.askGeminiToCreatePlan(selectedLocations);
+      if (!plan?.destinations?.length) return;
+      const data = await GeminiService.askGeminiToCreatePlan(plan.destinations);
       if (data) {
         const result = JSON.parse(data);
-        setPlan((prev: Plan) => ({
-          ...prev,
-          locations: result,
-        }));
+        setPlan((prev) => {
+          if (!prev) return null;
+          return {
+            ...prev,
+            destinations: result,
+          };
+        });
       }
     } catch (error: any) {
       showError(`Lỗi`);
@@ -109,111 +79,256 @@ export default function TravelPlan() {
     }
   };
 
-  const handleDeleteLocation = (location: LocationInfo) => {
-    updateSelectedLocations({ ...location, status: "NOT_VISITED" });
+  const onSave = async () => {
+    try {
+      setIsLoading(true);
+      const data = await HttpClient.post<ResponseId>(API_URLS.plan, plan);
+      if (!data) return;
+      navigateToPage(`/lich-trinh/${data.id}`);
+    } catch (error) {
+      showError("Lỗi không thể lưu");
+    } finally {
+      setIsLoading(false);
+      initPlan();
+      resetMap();
+    }
+  };
+
+  const handleNextStep = (currentStep: number) => {
+    setCurrentStep(currentStep);
+    if (currentStep === 3) {
+      updateDestinationInPlan();
+    }
+  };
+
+  const onNamePlanChange = (e: any) => {
+    if (!plan) return;
+    setPlan((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        title: (e.target as HTMLInputElement)?.value,
+      };
+    });
+  };
+
+  const fetchProvinces = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const data = await HttpClient.get<Province[]>(API_URLS.provinces);
+      setProvinces(data);
+    } catch (error) {
+      showError("Lỗi");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [currentStep]);
+
+  useEffect(() => {
+    if (currentStep === 1) {
+      initPlan();
+    }
+    if (currentStep === 2) {
+      fetchProvinces();
+    }
+  }, [fetchProvinces]);
+
+  const initPlan = () => {
+    setIsLoading(true);
+    setPlan({
+      title: "",
+      destinations: [],
+    });
+    setIsLoading(false);
+  };
+
+  const updateDestinationInPlan = () => {
+    setPlan((prev) => {
+      if (!prev) return prev;
+      const initialDestinations: Destination[] = selectedLocations.map((x) => ({
+        activities: [],
+        codeName: x.codeName,
+        name: x.name,
+        day: 1,
+      }));
+      return {
+        ...prev,
+        destinations: initialDestinations,
+      };
+    });
+  };
+
+  const handleActivityChange = (dest: Destination) => {
+    if (plan) {
+      setPlan((prev) => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          destinations: [
+            ...prev.destinations.map((d) =>
+              d.codeName === dest.codeName
+                ? { ...d, activities: dest.activities }
+                : d,
+            ),
+          ],
+        };
+      });
+    }
+  };
+
+  const handleSelectChange = (dest: Destination) => {
+    if (plan) {
+      setPlan((prev) => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          destinations: [
+            ...prev.destinations.map((d) =>
+              d.codeName === dest.codeName ? { ...d, day: dest.day } : d,
+            ),
+          ],
+        };
+      });
+    }
+  };
+
+  const handleDelete = (dest: Destination) => {
+    setPlan((prev) => {
+      if (!prev) return null;
+      return {
+        ...prev,
+        destinations: [
+          ...prev.destinations.filter((d) => d.codeName !== dest.codeName),
+        ],
+      };
+    });
   };
 
   return (
     <MainLayout hideButton>
-      <div className="mt-8 md:p-0 px-4">
-        <div className="flex justify-between items-center mb-4">
-          <div className="font-medium text-gray-700 text-xl">
-            Lịch trình sắp đến
-          </div>
+      <div className="mt-20 md:p-0 px-4">
+        {currentStep === 1 && (
+          <div className="flex flex-col gap-4 mx-auto p-4 md:p-0 w-full md:w-90">
+            <div className="flex flex-col">
+              <label htmlFor="" className="block mb-2 text-xl text-center">
+                Hãy đặt tên cho lịch trình của bạn
+              </label>
+              <input
+                type="text"
+                placeholder="Đặt tên cho lịch trình của bạn"
+                className="px-2 border-2 border-amber-600 rounded-md outline-none w-full h-10"
+                onChange={(e) => onNamePlanChange(e)}
+                value={plan?.title || ""}
+              />
+            </div>
 
-          <div className="flex items-center gap-2">
-            <Tooltip title="Hỏi AI">
-              <button
-                type="button"
-                className="flex items-center gap-2 px-4 border border-amber-600 rounded-md h-8 md:h-10 text-amber-600 text-xs md:text-sm cursor-pointer"
-                onClick={askGeminiToCreatePlan}
-              >
-                Gợi ý <Bot />
-              </button>
-            </Tooltip>
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-4">
-          {!!selectedLocations.length &&
-            selectedLocations
-              .filter((loc) => loc.status === "UPCOMING")
-              .map((x) => {
-                const actions =
-                  plan.locations.find((p) => p.locationName === x.codeName)
-                    ?.activities || [];
-
-                return (
-                  <div
-                    key={x.codeName}
-                    className="flex flex-col gap-2 shadow-md p-4 border border-slate-300 rounded-md"
-                  >
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center gap-2 font-medium">
-                        <MapPin className="w-4 h-4" />
-                        <span>{x.name}</span>
-                      </div>
-                      <div>
-                        <button
-                          type="button"
-                          className="flex items-center cursor-pointer"
-                          onClick={() => handleDeleteLocation(x)}
-                        >
-                          <Trash2 className="w-4 md:w-5 h-4 md:h-5 text-red-500" />
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        placeholder="Thêm hoạt động, điểm tham quan"
-                        value={inputs[x.codeName] || ""}
-                        onChange={(e) => onChange(e, x.codeName)}
-                        className="px-3 border border-slate-300 rounded-md w-full h-8 md:h-10 text-xs md:text-sm"
-                      />
-                      <button type="button" onClick={() => onAdd(x.codeName)}>
-                        <CirclePlus className="w-4 md:w-5 h-4 md:h-5" />
-                      </button>
-                    </div>
-
-                    {!!actions.length && (
-                      <ul className="flex flex-col gap-1">
-                        {actions.map((action, index) => (
-                          <li
-                            key={action}
-                            className="flex justify-between items-center text-sm"
-                          >
-                            <span>
-                              {index + 1}. {action}
-                            </span>
-                            <button
-                              type="button"
-                              onClick={() => onDelete(x.codeName, action)}
-                              className="cursor-pointer"
-                            >
-                              <X className="w-4 h-4 text-red-400" />
-                            </button>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                );
-              })}
-          {!Utils.object.isEmpty(plan.locations) && (
-            <div className="flex justify-end mb-4">
-              <Tooltip title="Tạo lịch trình">
+            {plan?.title && (
+              <div className="flex justify-end">
                 <button
                   type="button"
+                  onClick={() => handleNextStep(2)}
                   className="flex items-center gap-2 bg-amber-600 hover:bg-amber-500 px-4 rounded-md h-8 md:h-10 text-white text-xs md:text-sm cursor-pointer"
                 >
-                  Lưu
+                  Tiếp theo
                 </button>
-              </Tooltip>
+              </div>
+            )}
+          </div>
+        )}
+
+        {currentStep === 2 && (
+          <div className="flex flex-col gap-4">
+            <label htmlFor="" className="block mb-2 text-xl text-center">
+              Những nơi bạn muốn ghé đến
+            </label>
+            <div>
+              {provinces
+                .filter((p) => !p.isMerged)
+                .map((p) => (
+                  <Chip
+                    key={p.id}
+                    label={p.name || ""}
+                    className={clsx(
+                      "!mr-2 !mb-2 !text-xs !md:text-sm",
+                      selectedLocations.some(
+                        (loc) => loc.codeName === p.codeName,
+                      )
+                        ? "!text-white !bg-[#836FFF] "
+                        : "",
+                    )}
+                    onClick={() => {
+                      updateSelectedLocations({
+                        codeName: p.codeName,
+                        name: p.name,
+                        status: "UPCOMING",
+                      });
+
+                      updateDestinationInPlan();
+                    }}
+                  />
+                ))}
             </div>
-          )}
-        </div>
+            {!!selectedLocations.length && plan?.title && (
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => handleNextStep(3)}
+                  className="flex items-center gap-2 bg-amber-600 hover:bg-amber-500 px-4 rounded-md h-8 md:h-10 text-white text-xs md:text-sm cursor-pointer"
+                >
+                  Tiếp theo
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {currentStep === 3 && (
+          <div>
+            <h3 className="block mb-4 font-bold text-gray-700 text-xl md:text-4xl text-center word-wrap">
+              {plan?.title || "Hành trình"}
+            </h3>
+
+            {!!plan?.destinations.length && (
+              <div className="flex justify-center items-center">
+                <Tooltip title="Hỏi AI">
+                  <button
+                    type="button"
+                    className="flex items-center gap-1 px-4 border border-amber-600 rounded-md h-8 md:h-10 text-amber-600 text-xs md:text-sm cursor-pointer"
+                    onClick={askGeminiToCreatePlan}
+                  >
+                    Gợi ý bởi <Bot />
+                  </button>
+                </Tooltip>
+              </div>
+            )}
+
+            <div className="flex flex-col">
+              {plan?.destinations.map((destination) => (
+                <DestinationItem
+                  key={destination.codeName}
+                  destination={destination}
+                  onActivityChange={(dest) => handleActivityChange(dest)}
+                  onSelectChange={(dest) => handleSelectChange(dest)}
+                  onDelete={(dest) => handleDelete(dest)}
+                />
+              ))}
+            </div>
+
+            {!!plan?.destinations.length && (
+              <div className="flex justify-end mb-4">
+                <Tooltip title="Tạo lịch trình">
+                  <button
+                    type="button"
+                    onClick={onSave}
+                    className="flex items-center gap-2 bg-amber-600 hover:bg-amber-500 px-4 rounded-md h-8 md:h-10 text-white text-xs md:text-sm cursor-pointer"
+                  >
+                    Tạo lịch trình
+                  </button>
+                </Tooltip>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </MainLayout>
   );

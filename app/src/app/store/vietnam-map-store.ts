@@ -48,7 +48,7 @@ export const useVietnamMapStore = create<VietnamMapStore>((set) => ({
         };
       }
 
-      if (existingLoc && location.status === "NOT_VISITED") {
+      if (existingLoc || location.status === "NOT_VISITED") {
         return {
           selectedLocations: [
             ...state.selectedLocations.filter(
