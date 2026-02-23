@@ -45,7 +45,8 @@ const get = async (req, res) => {
                     codeName: x.codeName,
                     name: x.name,
                     id: x._id,
-                    activities: x.activities
+                    activities: x.activities,
+                    day: x.day
                 })),
                 ...rest,
             },
