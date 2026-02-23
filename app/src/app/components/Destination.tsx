@@ -53,7 +53,7 @@ export default function DestinationItem({
   };
 
   return (
-    <div className="shadow-lg p-4 border border-slate-300 rounded-md w-full">
+    <div className="shadow-lg p-4 border border-slate-300 rounded-md w-full text-gray-700">
       <div
         className={clsx(
           "flex items-center gap-1 mb-2",
