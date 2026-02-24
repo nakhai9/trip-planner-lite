@@ -1,5 +1,5 @@
 const Response = require("../utils/handleError");
-const PlanSchema = require("./../models/models")
+const PlanSchema = require("./../models/plan")
 const create = async (req, res) => {
     try {
 
@@ -27,7 +27,8 @@ const create = async (req, res) => {
 const get = async (req, res) => {
     try {
         const { id } = req.params;
-        const { isMerged } = req.query;
+        const payload = req.body;
+
         const plan = await PlanSchema.findById(id).lean();
 
         if (!plan) {
@@ -36,23 +37,36 @@ const get = async (req, res) => {
             });
         }
 
-        const {_id, destinations, ...rest} = plan;
+        const {_id, destinations, password,...rest} = plan;
 
-        res.status(201).json(Response({
-            code: "success",
-            data: {
-                id: _id,
-                destinations: destinations.map(x=> ({
-                    codeName: x.codeName,
-                    name: x.name,
-                    id: x._id,
-                    activities: x.activities,
-                    day: x.day
-                })),
-                ...rest,
-            },
-            message: ""
-        }));
+        if (payload?.password && password === payload.password) {
+            return res.status(201).json(Response({
+                code: "success",
+                data: {
+                    id: _id,
+                    destinations: destinations.map(x => ({
+                        codeName: x.codeName,
+                        name: x.name,
+                        id: x._id,
+                        activities: x.activities,
+                        day: x.day
+                    })),
+                    ...rest,
+                },
+                message: ""
+            }));
+        } else {
+            if (!plan.isPublic) {
+                return res.status(201).json(Response({
+                    code: "success",
+                    data: {
+                        // id: _id, // không return id khi đang ở chế độ riêng tư mà ko có mật khẩu
+                        isPubic: plan.isPublic
+                    },
+                    message: "Lịch trình riêng tư"
+                }))
+            }
+        }
     } catch (error) {
         res.status(500).json({ message: "Lỗi hệ thống", error: error.message });
     }

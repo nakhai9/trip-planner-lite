@@ -22,7 +22,15 @@ const PlanSchema = new mongoose.Schema({
             }
         ],
         default: []
-    }
+    },
+    isPublic: {
+        type: Boolean,
+        default: true
+    },
+    password: {
+        type: String,
+        default: null
+    },
 }, {
     versionKey: false,
     timestamps: true

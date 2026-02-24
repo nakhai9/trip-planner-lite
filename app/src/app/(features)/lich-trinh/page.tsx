@@ -4,7 +4,9 @@ import React, { useCallback, useEffect, useState } from "react";
 import {
   Autocomplete,
   Box,
+  Checkbox,
   Chip,
+  FormControlLabel,
   MenuItem,
   OutlinedInput,
   Select,
@@ -64,6 +66,8 @@ export default function TravelPlan() {
   const [plan, setPlan] = useState<Plan | null>(null);
 
   const [provinces, setProvinces] = useState<Province[]>([]);
+  const [isPrivate, setIsPrivate] = useState<boolean>(false);
+  const [passcode, setPasscode] = useState<string>("");
 
   const navigateToPage = (url?: string) => {
     if (!url) return;
@@ -95,7 +99,11 @@ export default function TravelPlan() {
   const onSave = async () => {
     try {
       setIsLoading(true);
-      const data = await HttpClient.post<ResponseId>(API_URLS.plan, plan);
+      const data = await HttpClient.post<ResponseId>(API_URLS.plan, {
+        ...plan,
+        password: passcode || undefined,
+        isPublic: !passcode.length && !isPrivate,
+      });
       if (!data) return;
       navigateToPage(`/lich-trinh/${data.id}`);
     } catch (error) {
@@ -219,27 +227,68 @@ export default function TravelPlan() {
     });
   };
 
+  const handleSetPrivate = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setIsPrivate(event.target.checked);
+  };
+
+  const handleFirstStep = () => {
+    if (isPrivate && !passcode.length) {
+      showError("Bạn cần nhập mã bảo vệ khi chọn chế độ riêng tư");
+      return;
+    }
+
+    if (passcode.length < 6) {
+      showError("Mã bảo vệ tối đa 6 kí tự");
+      return;
+    }
+    handleNextStep(2);
+  };
+
   return (
     <MainLayout hideButton>
       <div className="mt-20 md:p-0 px-4">
         {currentStep === 1 && (
           <div className="flex flex-col gap-4 mx-auto p-4 md:p-0 w-full md:w-90">
-            <div className="flex flex-col">
-              <label htmlFor="" className="block mb-2 text-xl text-center">
-                Hãy đặt tên cho lịch trình của bạn
-              </label>
-              <input
-                type="text"
-                placeholder="Đặt tên cho lịch trình của bạn"
-                className="px-2 border-2 border-amber-600 rounded-md outline-none w-full h-10"
-                onChange={(e) => onNamePlanChange(e)}
-                value={plan?.title || ""}
+            <div className="flex flex-col gap-2">
+              <div>
+                <label htmlFor="" className="block mb-2 text-xl text-center">
+                  Hãy đặt tên cho lịch trình của bạn
+                </label>
+                <input
+                  type="text"
+                  placeholder="Đặt tên cho lịch trình của bạn"
+                  className="px-2 border-2 border-amber-600 rounded-md outline-none w-full h-10"
+                  onChange={(e) => onNamePlanChange(e)}
+                  value={plan?.title || ""}
+                />
+              </div>
+              <FormControlLabel
+                control={
+                  <Checkbox checked={isPrivate} onChange={handleSetPrivate} />
+                }
+                label="Chế độ riêng tư"
               />
+              {isPrivate && (
+                <div>
+                  <label htmlFor="#passcode">
+                    Mã bảo vệ <span className="text-red-600">*</span>
+                  </label>
+                  <input
+                    id="passcode"
+                    type="password"
+                    className="px-2 border-2 border-amber-600 rounded-md outline-none w-full h-10"
+                    value={passcode || ""}
+                    onChange={(e) =>
+                      setPasscode((e.target as HTMLInputElement)?.value)
+                    }
+                  />
+                </div>
+              )}
               <div className="flex justify-end mt-2">
                 {currentStep === 1 && plan?.title && (
                   <button
                     type="button"
-                    onClick={() => handleNextStep(2)}
+                    onClick={handleFirstStep}
                     className="flex items-center gap-2 bg-amber-600 hover:bg-amber-500 px-4 rounded-md h-8 md:h-10 text-white text-xs md:text-sm cursor-pointer"
                   >
                     Tiếp theo

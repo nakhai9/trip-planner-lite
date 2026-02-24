@@ -29,4 +29,6 @@ export type PlanDetails = {
   description?: string;
   createdAt: string;
   updatedAt: string;
+  password?: string;
+  isPublic?: boolean;
 };
