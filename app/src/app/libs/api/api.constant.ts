@@ -4,4 +4,5 @@ export const API_URLS = {
   upload: API_BASE_URL + "/upload",
   plan: API_BASE_URL + "/plan",
   provinces: API_BASE_URL + "/provinces",
+  svgVectorMap: API_BASE_URL + "/svg-vector-map",
 };

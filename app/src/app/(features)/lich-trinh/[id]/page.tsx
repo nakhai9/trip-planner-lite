@@ -49,32 +49,26 @@ export default function PlanDetailsPage({}: PlanDetailsProps) {
 
   return (
     <MainLayout hideButton={true}>
-      <div className="mt-10 md:p-0 px-4">
-        <div className="relative">
-          <h4 className="top-1/2 left-1/2 z-10 absolute font-bold text-white text-xl md:text-4xl text-center -translate-x-1/2 -translate-y-1/2">
-            {details ? details["title"] : "Hành trình"}
-          </h4>
-          <img
-            className="w-full h-40 md:h-80"
-            src="https://i.pinimg.com/originals/54/fc/29/54fc29bd3a4bd6468f0fbb05e98f9486.jpg"
-            alt=""
-          />
-        </div>
-
-        {qrCodeUrl && (
-          <div className="flex justify-center items-center px-4 md:px-0">
-            <h4 className="text-gray-700 text-xs text-center">
-              Hãy gởi bạn bè của bạn mã QR này để họ dễ dàng theo dõi lịch trình
+      <div className="mt-10 mt-20 md:p-0 px-4">
+        <div className="flex justify-between items-center">
+          <div>
+            <h4 className="font-bold text-amber-500 text-xl md:text-4xl">
+              {details ? details["title"] : "Hành trình"}
             </h4>
+            <p className="text-gray-700 text-xs md:text-sm">
+              Hãy gởi bạn bè của bạn mã QR này để họ dễ dàng theo dõi lịch trình
+            </p>
+          </div>
+          {qrCodeUrl && (
             <img
               src={qrCodeUrl}
               alt="qr"
-              className="w-20 w-20 md:w-30 md:h-30"
+              className="w-16 w-16 md:w-30 md:h-30"
             />
-          </div>
-        )}
+          )}
+        </div>
 
-        <div className="gap-2 grid md:grid-cols-3">
+        <div className="gap-2 grid md:grid-cols-3 mt-3">
           {details?.destinations.map((destination) => (
             <DestinationItem
               key={destination.codeName}

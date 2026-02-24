@@ -8,6 +8,7 @@ const connectDB = require("./configs/mongodbConfig");
 const uploadRouter = require("./routes/upload");
 const planRouter = require("./routes/plan");
 const provinceRouter = require("./routes/province")
+const svgVectorMapRouter = require("./routes/svgVectorMap")
 
 const app = express();
 
@@ -32,7 +33,7 @@ app.get("/api/hello", (req, res) => {
 app.use("/api/upload/", uploadRouter);
 app.use("/api/plan", planRouter);
 app.use('/api/provinces', provinceRouter)
-
+app.use("/api/svg-vector-map", svgVectorMapRouter)
 
 
 // Start server

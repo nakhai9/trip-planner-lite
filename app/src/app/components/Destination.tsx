@@ -145,7 +145,7 @@ export default function DestinationItem({
               <p className="block my-2 font-medium text-amber-600 text-sm text-center">
                 Hoạt động, điểm than quan
               </p>
-              <ul className="list-disc">
+              <ul className="marker:text-amber-600 list-disc">
                 {destination.activities?.map((a) => {
                   return (
                     <li key={a} className="ml-5 text-xs md:text-sm">

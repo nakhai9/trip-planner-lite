@@ -66,7 +66,7 @@ export default function TravelPlan() {
   };
 
   const askGeminiToCreatePlan = async () => {
-    setIsLoading(true, "Gemini đang tìm kiếm những gợi ý phù hợp...");
+    setIsLoading(true, "Google Gemini đang tìm kiếm những gợi ý phù hợp...");
     try {
       if (!plan?.destinations?.length) return;
       const data = await GeminiService.askGeminiToCreatePlan(plan.destinations);

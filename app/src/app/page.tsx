@@ -2,15 +2,17 @@
 
 import { useRouter } from "next/navigation";
 import MainLayout from "./ui/layout/MainLayout";
-import { useToast } from "./store/global-store";
+import { useGlobalStore } from "./store/global-store";
 
 export default function Home() {
   const router = useRouter();
-  const { showInfo } = useToast();
+  const { setIsLoading } = useGlobalStore();
 
   const navigateToPage = (url?: string) => {
     if (!url) return;
+    setIsLoading(true);
     router.push(url);
+    setIsLoading(false);
   };
 
   return (
