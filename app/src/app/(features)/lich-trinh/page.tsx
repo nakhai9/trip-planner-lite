@@ -232,15 +232,18 @@ export default function TravelPlan() {
   };
 
   const handleFirstStep = () => {
-    if (isPrivate && !passcode.length) {
-      showError("Bạn cần nhập mã bảo vệ khi chọn chế độ riêng tư");
-      return;
+    if (isPrivate) {
+      if (!passcode.length) {
+        showError("Bạn cần nhập mã bảo vệ khi chọn chế độ riêng tư");
+        return;
+      }
+
+      if (passcode.length < 6) {
+        showError("Mã bảo vệ tối đa 6 kí tự");
+        return;
+      }
     }
 
-    if (passcode.length < 6) {
-      showError("Mã bảo vệ tối đa 6 kí tự");
-      return;
-    }
     handleNextStep(2);
   };
 

@@ -24,7 +24,7 @@ export default function PlanDetailsPage({}: PlanDetailsProps) {
     async (passcode?: string) => {
       setIsLoading(true);
       try {
-        const details = await HttpClient.post<PlanDetails>(
+        const details = await HttpClient.post<any>(
           `${API_URLS.plan}/${id}`,
           passcode && {
             password: passcode,

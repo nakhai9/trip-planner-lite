@@ -66,6 +66,22 @@ const get = async (req, res) => {
                     message: "Lịch trình riêng tư"
                 }))
             }
+
+            return res.status(201).json(Response({
+                code: "success",
+                data: {
+                    id: _id,
+                    destinations: destinations.map(x => ({
+                        codeName: x.codeName,
+                        name: x.name,
+                        id: x._id,
+                        activities: x.activities,
+                        day: x.day
+                    })),
+                    ...rest,
+                },
+                message: ""
+            }));
         }
     } catch (error) {
         res.status(500).json({ message: "Lỗi hệ thống", error: error.message });
