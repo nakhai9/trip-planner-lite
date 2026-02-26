@@ -19,9 +19,9 @@ export default function Home() {
     <MainLayout hideButton={true}>
       <div className="gap-2 grid md:grid-cols-4 grid-col mt-40 p-4 md:p-0">
         <div></div>
-        <div className="flex flex-col gap-2 shadow-lg p-4 border border-amber-500 rounded-md">
-          <h3 className="text-lg">Tạo hành trình</h3>
-          <p className="text-slate-700 text-xs">
+        <div className="flex flex-col gap-2 shadow-2xl p-4 border border-slate-100 rounded-md">
+          <h3 className="font-medium text-amber-600 text-lg">Tạo hành trình</h3>
+          <p className="h-16 text-slate-700 text-xs md:text-sm">
             Dễ dàng lên kế hoạch cá nhân/nhóm cho những chuyến du lịch
           </p>
           <button
@@ -32,9 +32,9 @@ export default function Home() {
             Bắt đầu
           </button>
         </div>
-        <div className="flex flex-col gap-2 shadow-lg p-4 border border-amber-500 rounded-md">
-          <h3 className="text-lg">Chia sẻ</h3>
-          <p className="text-slate-700 text-xs">
+        <div className="flex flex-col gap-2 shadow-2xl p-4 border border-slate-100 rounded-md">
+          <h3 className="font-medium text-amber-600 text-lg">Chia sẻ</h3>
+          <p className="h-16 text-slate-700 text-xs md:text-sm">
             Tạo và chia sẻ hành trình những nơi đã đi qua dưới dạng hình ảnh
           </p>
           <button

@@ -1,19 +1,19 @@
-import { Button, ButtonProps } from "@mui/material";
+import React from "react";
 
-const BUTTON_STYLES = {
-    primary: {
-        padding: '8px 16px',
-        backgroundColor: '#1976d2',
-        color: '#ffffff',
-    }
-}
+type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement>;
 
-type MTAButtonProps = {
-    label: string;
-}  & ButtonProps;
-
-export default function MTAButton({label = '', ...props}) {
-    return <Button {...props}>
-        { label }
-    </Button>
+export default function Button({
+  children,
+  className = "",
+  ...rest
+}: ButtonProps) {
+  return (
+    <button
+      type="button"
+      {...rest}
+      className={`box-border bg-warning hover:bg-warning-strong shadow-xs px-4 py-2.5 border border-transparent rounded-base focus:outline-none focus:ring-4 focus:ring-warning-medium font-medium text-white text-sm leading-5 ${className}`}
+    >
+      {children ?? "Warning"}
+    </button>
+  );
 }
