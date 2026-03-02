@@ -1,3 +1,4 @@
+const Response = require("../utils/handleError");
 const Utils = require("../utils/uploadUtils");
 
 const uploadFiles = async (req, res, next) => {
@@ -8,7 +9,9 @@ const uploadFiles = async (req, res, next) => {
         const result = await Utils.file.handleUploadToCloudinary(req.file, {
             public_id: req.file.originalname,
         });
-        return res.status(200).json({ message: "File uploaded successfully", data: result });
+
+        const { secure_url, public_id, ...rest } = result;
+        return res.status(200).json(Response({ message: "File uploaded successfully", data: { url: secure_url, public_id: public_id } }));
     } catch (error) {
         return res.status(500).json({ message: "Error uploading file", error: error.message });
     }

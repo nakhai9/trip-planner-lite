@@ -2,6 +2,7 @@
 import MapViewer from "@/app/components/MapViewer";
 import SocialShare from "@/app/components/SocialShare";
 import { API_URLS } from "@/app/libs/api/api.constant";
+import { HttpClient } from "@/app/libs/api/axios";
 import { LocationInfo } from "@/app/model";
 import { useGlobalStore, useToast } from "@/app/store/global-store";
 import { useVietnamMapStore } from "@/app/store/vietnam-map-store";
@@ -81,7 +82,8 @@ export default function ChiaSeHinhAnh() {
     });
 
     const data = await res.json();
-    setUrl(data.data.secure_url);
+    await updatePlanImages(data.data.url);
+    setUrl(data.data.url);
     setIsLoading(false);
   };
 
@@ -119,6 +121,13 @@ export default function ChiaSeHinhAnh() {
   useEffect(() => {
     resetSelectedLocationsToShare();
   }, []);
+
+  const updatePlanImages = async (url: string, userId?: string) => {
+    await HttpClient.post<{ url: string; userId?: string }>(
+      API_URLS.planImage,
+      { url, userId },
+    );
+  };
 
   return (
     <MainLayout hideButton={false}>

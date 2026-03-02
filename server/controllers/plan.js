@@ -1,3 +1,4 @@
+const { GUEST_USER_ID } = require("../common/constants");
 const Response = require("../utils/handleError");
 const PlanSchema = require("./../models/plan")
 const create = async (req, res) => {
@@ -11,7 +12,7 @@ const create = async (req, res) => {
 
         const plan = await PlanSchema.create({
             ...payload,
-            userId: payload.userId ? payload.userId : "69a411236ef8aea7d9e0e96c"
+            userId: payload.userId ? payload.userId : GUEST_USER_ID
         });
 
         res.status(201).json(Response({
