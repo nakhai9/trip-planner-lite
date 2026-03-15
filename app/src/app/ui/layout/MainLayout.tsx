@@ -33,7 +33,7 @@ export default function MainLayout({
   return (
     <div className="relative flex flex-col min-h-screen font-sans">
       <div className="top-0 left-0 z-50 fixed flex bg-white shadow-md w-full">
-        <div className="flex justify-center md:justify-between items-center gap-4 bg-white mx-auto px-4 md:px-0 w-full md:w-2xl lg:w-5xl h-14">
+        <div className="flex justify-center md:justify-between items-center gap-4 bg-white mx-auto px-4 md:px-0 w-full md:w-2xl lg:w-6xl h-14">
           <h1
             onClick={() => router.push("/")}
             className="block app-bg-primary p-2 md:px-2 md:py-0 font-medium app-text-white text-xl md:text-3xl md:text-left text-center italic cursor-pointer"
@@ -63,7 +63,7 @@ export default function MainLayout({
           )}
         </div>
       </div>
-      <main className="mx-auto w-full w-full md:w-2xl lg:w-5xl">
+      <main className="mx-auto w-full w-full md:w-2xl lg:w-6xl">
         {children}
       </main>
       {open && <Modal />}

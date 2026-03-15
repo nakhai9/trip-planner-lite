@@ -375,7 +375,7 @@ export default function TravelPlan() {
               </div>
             )}
 
-            <div className="gap-3 grid md:grid-cols-3 mt-3">
+            <div className="gap-3 grid md:grid-cols-2 lg:grid-cols-3 mt-3">
               {plan?.destinations.map((destination) => (
                 <DestinationItem
                   key={destination.codeName}

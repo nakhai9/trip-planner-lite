@@ -3,8 +3,10 @@
 import clsx from "clsx";
 import {
   CirclePlus,
+  LandPlot,
   MapPin,
   MapPinned,
+  Navigation,
   Pencil,
   Trash,
   Trash2,
@@ -12,7 +14,6 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "../store/global-store";
-import Button from "../ui/button";
 import Input from "../ui/input";
 import IconButton from "../ui/icon-button";
 
@@ -20,7 +21,10 @@ export type Destination = {
   id?: string;
   codeName: string;
   name: string;
-  activities: string[];
+  activities: Array<{
+    name: string;
+    address?: string;
+  }>;
   day: number;
 };
 type DestinationItemProps = {
@@ -58,7 +62,12 @@ export default function DestinationItem({
     setActivity("");
     onActivityChange?.({
       ...destination,
-      activities: [...destination.activities, activity],
+      activities: [
+        ...destination.activities,
+        {
+          name: activity,
+        },
+      ],
     });
   };
 
@@ -79,8 +88,26 @@ export default function DestinationItem({
   const handleDeleteActivities = (activity: string) => {
     onActivityChange?.({
       ...destination,
-      activities: [...destination.activities.filter((a) => a !== activity)],
+      activities: [
+        ...destination.activities.filter((a) => a.name !== activity),
+      ],
     });
+  };
+
+  const getCoordinates = async (address: string) => {
+    if (!address) return;
+    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent("Đền thờ Vua Hùng Cần Thơ")}`;
+
+    const response = await fetch(url, {
+      headers: {
+        "User-Agent": "my-travel-app",
+        "Accept-Language": "*",
+      },
+    });
+
+    const data = await response.json();
+
+    console.log(data);
   };
 
   return (
@@ -145,50 +172,56 @@ export default function DestinationItem({
               onChange={handleInputChange}
             />
             <IconButton type="button" onClick={handleAddActivity}>
-              <CirclePlus className="w-4 md:w-5 h-4 md:h-5" />
+              <CirclePlus className="flex-1 w-4 md:w-5 h-4 md:h-5 shrink-0" />
             </IconButton>
           </div>
         )}
         <div className="mt-2 max-h-[300px] overflow-y-auto">
           {destination.activities.length > 0 ? (
             <div>
-              <p className="block my-2 font-medium text-amber-600 text-sm text-center">
+              {/* <p className="block my-2 font-medium text-amber-600 text-sm text-center">
                 Hoạt động, điểm than quan
-              </p>
-              <ul className="marker:text-amber-600 list-disc">
-                {destination.activities?.map((a, index) => {
-                  return (
-                    <li
-                      key={a + ":idx=" + index}
-                      className="ml-5 text-xs md:text-sm"
+              </p> */}
+              {destination.activities?.map((a, index) => {
+                return (
+                  <div
+                    key={a.name + "/" + a.address}
+                    className="flex flex-col gap-1 py-1 w-full"
+                  >
+                    <div className="flex justify-between items-center">
+                      <div className="text-sm">{a.name}</div>
+                      <IconButton
+                        type="button"
+                        onClick={() => handleDeleteActivities(a.name)}
+                        className={clsx(
+                          "flex items-center",
+                          readonly && "hidden",
+                        )}
+                      >
+                        <X className="w-4 h-4 font-bold text-red-500" />
+                      </IconButton>
+                    </div>
+                    <div
+                      className="flex items-center gap-1 font-normal text-xs"
+                      onClick={() => getCoordinates(a.address ?? "")}
                     >
-                      <div className="flex items-center gap-1 w-full">
-                        <p>{a}</p>
-                        <IconButton
-                          type="button"
-                          onClick={() => handleDeleteActivities(a)}
-                          className={clsx(
-                            "flex items-center",
-                            readonly && "hidden",
-                          )}
-                        >
-                          <X className="w-4 h-4 font-bold text-red-500" />
-                        </IconButton>
-                        <IconButton
-                          type="button"
-                          onClick={() => handleDeleteActivities(a)}
-                          className={clsx(
-                            "flex items-center",
-                            readonly && "hidden",
-                          )}
-                        >
-                          <MapPinned className="w-4 h-4 font-bold text-red-500" />
-                        </IconButton>
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
+                      <Navigation size={14} className="shrink-0" />
+                      <span className="truncate">{a.address}</span>
+                    </div>
+
+                    {/* <IconButton
+                      type="button"
+                      onClick={() => handleDeleteActivities(a.name)}
+                      className={clsx(
+                        "flex items-center",
+                        readonly && "hidden",
+                      )}
+                    >
+                      <MapPinned className="w-4 h-4 font-bold text-red-500" />
+                    </IconButton> */}
+                  </div>
+                );
+              })}
             </div>
           ) : (
             <span className="mt-1 text-gray-500 text-xs md:text-sm italic">
