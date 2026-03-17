@@ -38,7 +38,7 @@ export default function MainLayout({
             onClick={() => router.push("/")}
             className="block app-bg-primary p-2 md:px-2 md:py-0 font-medium app-text-white text-xl md:text-3xl md:text-left text-center italic cursor-pointer"
           >
-            AroundVietnam
+            TripBuilder
           </h1>
           {!hideButton && (
             <div className="flex gap-4">
