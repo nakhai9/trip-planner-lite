@@ -7,7 +7,7 @@ import { useGlobalStore, useToast } from "@/app/store/global-store";
 import { API_URLS } from "@/app/libs/api/api.constant";
 import { HttpClient } from "@/app/libs/api/axios";
 import { PlanDetails } from "@/app/model";
-import DestinationItem from "@/app/components/Destination";
+import DestinationCard from "@/app/components/Destination";
 import Button from "@/app/ui/button";
 import Input from "@/app/ui/input";
 import { Info, Pencil, X } from "lucide-react";
@@ -118,18 +118,22 @@ export default function PlanDetailsPage({}: PlanDetailsProps) {
           )}
           {!isLoading && details.canView && (
             <>
-              <div className="flex justify-center items-center gap-2">
-                <h4 className="py-4 font-bold text-amber-500 text-xl md:text-4xl">
+              <div className="flex flex-col gap-2 py-2 md:py-5">
+                <h4 className="block font-bold text-amber-500 text-xl md:text-4xl">
                   {details["title"]}
                 </h4>
+                <p className="block font-thin text-gray-500">
+                  A relaxing beach vacation with college friends
+                </p>
               </div>
 
-              <div className="gap-2 grid md:grid-cols-2 lg:grid-cols-3 mt-3">
+              <div className="gap-3 grid md:grid-cols-2 lg:grid-cols-3 mt-3">
                 {(details?.destinations ?? []).map((destination) => (
-                  <DestinationItem
+                  <DestinationCard
                     key={destination.codeName}
                     destination={destination}
                     readonly={true}
+                    version="v2"
                   />
                 ))}
               </div>
