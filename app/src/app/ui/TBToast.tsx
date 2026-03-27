@@ -1,16 +1,21 @@
+"use client";
+
 import { Alert, Snackbar } from "@mui/material";
-type ToastProps = {
+import type { ReactNode } from "react";
+
+type TBToastProps = {
   isShow: boolean;
   type: "success" | "error" | "warning" | "info";
-  message: any;
+  message: ReactNode;
   onClose?: () => void;
 };
-export default function Toast({
+
+export default function TBToast({
   isShow = false,
   type = "success",
   message,
   onClose,
-}: ToastProps) {
+}: TBToastProps) {
   return (
     <Snackbar
       open={isShow}

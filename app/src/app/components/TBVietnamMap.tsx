@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { LocationInfo, LocationModel } from "../model";
 import { useVietnamMapStore } from "../store/vietnam-map-store";
 import useMousePosition from "../hooks/useMousePosition";
+import { Box } from "@mui/material";
+import { hexWithAlpha, TB_COLORS } from "@/app/libs/colors";
 
-type VietnamMapProps = {
+type TBVietnamMapProps = {
   locationIds?: string[];
   locations?: LocationInfo[];
   onClick?: (location: LocationInfo) => void;
@@ -31,21 +33,17 @@ type VietnamMapProps = {
   ) => void;
 };
 
-export default function VietnamMap({
+export default function TBVietnamMap({
   locationIds = [],
   locations = [],
   onClick,
   zoomToElement,
-}: VietnamMapProps) {
+}: TBVietnamMapProps) {
   const wrapperRef = useRef<HTMLDivElement | null>(null);
 
   const currentMap = useVietnamMapStore((state) => state.currentMap);
   const { x, y } = useMousePosition();
   const [text, setText] = useState<string | null>(null);
-  const [mousePos, setMousePos] = useState<{ x: number; y: number }>({
-    x: 0,
-    y: 0,
-  });
 
   const handleClick = (item: LocationModel) => {
     if (item.codeName)
@@ -57,17 +55,23 @@ export default function VietnamMap({
   };
 
   return (
-    <div className="relative">
-      <div
+    <Box sx={{ position: "relative" }}>
+      <Box
         id="vietnam-map-wrapper"
-        className="flex justify-center"
         ref={wrapperRef}
+        sx={{ display: "flex", justifyContent: "center" }}
       >
-        <svg
+        <Box
+          component="svg"
           viewBox="0 0 800 800"
-          className="w-[500px] sm:w-[400px] md:w-[600px] h-[500px] sm:h-[400px] md:h-[600px] select-none"
           xmlns="http://www.w3.org/2000/svg"
           id="vietnam-map-svg"
+          sx={{
+            width: { xs: 400, sm: 400, md: 600 },
+            height: { xs: 400, sm: 400, md: 600 },
+            maxWidth: 500,
+            userSelect: "none",
+          }}
         >
           <g className="group-state">
             {currentMap.map((item: LocationModel) => (
@@ -96,25 +100,28 @@ export default function VietnamMap({
               />
             ))}
           </g>
-        </svg>
-      </div>
-      <div
+        </Box>
+      </Box>
+      <Box
         id="state-tooltip"
-        className="hidden md:block z-50 fixed text-sm pointer-events-none"
-        style={{
+        sx={{
+          display: { xs: "none", md: text ? "block" : "none" },
           position: "fixed",
-          display: text ? "block" : "none",
-          background: "rgba(0, 0, 0, 0.8)",
-          padding: "6px 10px",
-          borderRadius: "4px",
-          color: "white",
+          zIndex: (t) => t.zIndex.tooltip,
+          left: x + 12,
+          top: y + 12,
+          pointerEvents: "none",
+          bgcolor: hexWithAlpha(TB_COLORS.black, 0.8),
+          px: 1.25,
+          py: 0.75,
+          borderRadius: 0.5,
+          color: "common.white",
+          fontSize: "0.875rem",
           lineHeight: "14px",
-          left: `${x + 12}px`,
-          top: `${y + 12}px`,
         }}
       >
         {text}
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 }

@@ -1,16 +1,22 @@
 "use client";
-import MapViewer from "@/app/components/MapViewer";
-import SocialShare from "@/app/components/SocialShare";
+import TBMapViewer from "@/app/components/TBMapViewer";
+import TBSocialShare from "@/app/components/TBSocialShare";
 import { API_URLS } from "@/app/libs/api/api.constant";
 import { HttpClient } from "@/app/libs/api/axios";
 import { LocationInfo } from "@/app/model";
 import { useGlobalStore, useToast } from "@/app/store/global-store";
 import { useVietnamMapStore } from "@/app/store/vietnam-map-store";
-import MainLayout from "@/app/ui/layout/MainLayout";
-import Button from "@/app/ui/button";
-import IconButton from "@/app/ui/icon-button";
-import { Dialog, Tooltip } from "@mui/material";
-import clsx from "clsx";
+import TBMainLayout from "@/app/ui/layout/TBMainLayout";
+import TBButton from "@/app/ui/TBButton";
+import TBIconButton from "@/app/ui/TBIconButton";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  Stack,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import {
   Flag,
   Footprints,
@@ -23,7 +29,7 @@ import {
 import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 
-export default function ChiaSeHinhAnh() {
+export default function TBChiaSeHinhAnhPage() {
   const [location, setLocation] = React.useState<LocationInfo | null>(null);
   const [open, setOpen] = React.useState(false);
   const [url, setUrl] = React.useState("https://example.com");
@@ -122,7 +128,7 @@ export default function ChiaSeHinhAnh() {
 
   useEffect(() => {
     resetSelectedLocationsToShare();
-  }, []);
+  }, [resetSelectedLocationsToShare]);
 
   const updatePlanImages = async (url: string, userId?: string) => {
     await HttpClient.post<{ url: string; userId?: string }>(
@@ -131,107 +137,149 @@ export default function ChiaSeHinhAnh() {
     );
   };
 
+  const visitedColor = "#FE9A00";
+  const upcomingColor = "#836FFF";
+
   return (
-    <MainLayout hideButton={false}>
-      <div className="mt-20 md:p-0 px-4">
-        <div className="flex justify-end items-center gap-2">
+    <TBMainLayout hideButton={false}>
+      <Stack sx={{ mt: 10, px: { xs: 2, md: 0 } }}>
+        <Stack direction="row" justifyContent="flex-end" alignItems="center" spacing={1} flexWrap="wrap">
           {selectedLocationsToShare.filter((x) => x.status === "UPCOMING")
             .length > 0 && (
             <Tooltip title="Tạo lịch trình">
-              <Button
+              <TBButton
                 onClick={() => navigateToPage("/lich-trinh")}
-                leftIcon={<MapPinned className="w-4 md:w-5 h-4 md:h-5" />}
+                sx={{ "& svg": { width: { xs: 16, md: 20 }, height: { xs: 16, md: 20 } } }}
+                leftIcon={<MapPinned />}
               >
                 Tạo lịch trình
-              </Button>
+              </TBButton>
             </Tooltip>
           )}
           {selectedLocationsToShare.length > 0 && (
             <>
               <Tooltip title="Tạo hình ảnh để chia sẻ">
-                <Button
+                <TBButton
                   onClick={onShareModal}
-                  leftIcon={<Share2 className="w-4 md:w-5 h-4 md:h-5" />}
+                  sx={{ "& svg": { width: { xs: 16, md: 20 }, height: { xs: 16, md: 20 } } }}
+                  leftIcon={<Share2 />}
                 >
                   Chia sẻ lên mạng xã hội
-                </Button>
+                </TBButton>
               </Tooltip>
               <Tooltip title="Khôi phục">
-                <Button
+                <TBButton
                   variant="outline"
                   onClick={resetSelectedLocationsToShare}
-                  className="icon"
-                  leftIcon={<RotateCw className="w-4 md:w-5 h-4 md:h-5" />}
+                  sx={{ minWidth: 48, "& svg": { width: { xs: 16, md: 20 }, height: { xs: 16, md: 20 } } }}
+                  leftIcon={<RotateCw />}
                 />
               </Tooltip>
             </>
           )}
-        </div>
-        <MapViewer
+        </Stack>
+        <TBMapViewer
           locations={selectedLocationsToShare}
           onChoose={(location) => handleChooseLocation(location)}
         />
-      </div>
-      <Dialog open={open} keepMounted>
-        <div className="flex justify-between items-center p-5 dialog-header">
-          <h3 className="font-medium md:text-lg">
+      </Stack>
+      <Dialog open={open} onClose={() => setOpen(false)} keepMounted maxWidth="sm" fullWidth>
+        <DialogTitle
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <Typography fontWeight={500} variant="subtitle1">
             {modalName === "mark-modal" ? "Địa điểm" : "Chia sẻ hành trình"}
-          </h3>
-          <IconButton
-            className="text-gray-700"
+          </Typography>
+          <TBIconButton
+            sx={{ color: "grey.700" }}
             onClick={() => setOpen(false)}
+            aria-label="Đóng"
           >
             <X />
-          </IconButton>
-        </div>
-        <div className="p-5 min-w-56">
+          </TBIconButton>
+        </DialogTitle>
+        <DialogContent sx={{ minWidth: 224 }}>
           {modalName === "mark-modal" && (
-            <div className="w-48 md:w-64">
-              <div className="mb-4 font-medium text-2xl text-center">
+            <Stack sx={{ maxWidth: { xs: 192, md: 256 }, mx: "auto" }}>
+              <Typography
+                variant="h5"
+                fontWeight={500}
+                textAlign="center"
+                sx={{ mb: 2 }}
+              >
                 {location?.name ?? "-"}
-              </div>
-              <div className="flex justify-center gap-6 md:gap-10">
+              </Typography>
+              <Stack direction="row" justifyContent="center" spacing={{ xs: 3, md: 5 }}>
                 {location?.status !== "UPCOMING" && (
-                  <button
+                  <Stack
+                    component="button"
+                    type="button"
+                    spacing={1}
+                    alignItems="center"
                     onClick={() => pinLocation(location as LocationInfo)}
-                    className={clsx(
-                      `flex flex-col justify-center items-center gap-2 cursor-pointer`,
-                      location?.status === "VISITED" ? "!text-[#FE9A00]" : "",
-                    )}
+                    sx={{
+                      border: "none",
+                      background: "none",
+                      cursor: "pointer",
+                      p: 0,
+                      color:
+                        location?.status === "VISITED" ? visitedColor : "inherit",
+                    }}
                   >
                     <Flag />
-                    <p className="text-xs md:text-sm">Đã đến</p>
-                  </button>
+                    <Typography variant="caption">Đã đến</Typography>
+                  </Stack>
                 )}
                 {location?.status !== "VISITED" && (
-                  <button
+                  <Stack
+                    component="button"
+                    type="button"
+                    spacing={1}
+                    alignItems="center"
                     onClick={() => handleMarkUpcoming(location as LocationInfo)}
-                    className={clsx(
-                      `flex flex-col justify-center items-center gap-2 cursor-pointer`,
-                      location?.status === "UPCOMING" && "text-[#836FFF]",
-                    )}
+                    sx={{
+                      border: "none",
+                      background: "none",
+                      cursor: "pointer",
+                      p: 0,
+                      color:
+                        location?.status === "UPCOMING" ? upcomingColor : "inherit",
+                    }}
                   >
                     <Footprints />
-                    <p className="text-xs md:text-sm">Sắp đến</p>
-                  </button>
+                    <Typography variant="caption">Sắp đến</Typography>
+                  </Stack>
                 )}
 
                 {location?.status && location?.status !== "NOT_VISITED" && (
-                  <button
+                  <Stack
+                    component="button"
+                    type="button"
+                    spacing={1}
+                    alignItems="center"
                     onClick={() => unpinLocation(location as LocationInfo)}
-                    className="flex flex-col justify-center items-center gap-2 cursor-pointer"
+                    sx={{
+                      border: "none",
+                      background: "none",
+                      cursor: "pointer",
+                      p: 0,
+                    }}
                   >
                     <PinOff />
-                    <p className="text-xs md:text-sm">Tháo ghim</p>
-                  </button>
+                    <Typography variant="caption">Tháo ghim</Typography>
+                  </Stack>
                 )}
-              </div>
-            </div>
+              </Stack>
+            </Stack>
           )}
 
-          {modalName === "share-modal" && <SocialShare url={url} />}
-        </div>
+          {modalName === "share-modal" && <TBSocialShare url={url} />}
+        </DialogContent>
       </Dialog>
-    </MainLayout>
+    </TBMainLayout>
   );
 }

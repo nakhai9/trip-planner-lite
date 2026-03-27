@@ -9,4 +9,19 @@ export const Utils = {
       return str1 === str2;
     },
   },
+  random: {
+    uuid: () => {
+      return crypto.randomUUID();
+    },
+  },
+  date: {
+    getStartDate: () => {
+      const date = new Date();
+      date.setDate(date.getDate() + 1);
+
+      return date.toISOString().split("T")[0];
+    },
+  },
 };
+
+export const NOOP_FNC = () => {};

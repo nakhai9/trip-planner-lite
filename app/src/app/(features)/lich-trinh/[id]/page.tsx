@@ -1,5 +1,5 @@
 "use client";
-import MainLayout from "@/app/ui/layout/MainLayout";
+import TBMainLayout from "@/app/ui/layout/TBMainLayout";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import QRCode from "qrcode";
@@ -7,13 +7,14 @@ import { useGlobalStore, useToast } from "@/app/store/global-store";
 import { API_URLS } from "@/app/libs/api/api.constant";
 import { HttpClient } from "@/app/libs/api/axios";
 import { PlanDetails } from "@/app/model";
-import DestinationCard from "@/app/components/Destination";
-import Button from "@/app/ui/button";
-import Input from "@/app/ui/input";
-import { Info, Pencil, X } from "lucide-react";
-import IconButton from "@/app/ui/icon-button";
-type PlanDetailsProps = {};
-export default function PlanDetailsPage({}: PlanDetailsProps) {
+import TBButton from "@/app/ui/TBButton";
+import TBInput from "@/app/ui/TBInput";
+import TbItineraryLocation from "@/app/components/Itinerary/TbItineraryLocation";
+import type { ItineraryLocation as TBDestinationV2Model } from "@/app/components/Itinerary/TbItineraryLocation";
+import { Box, Stack, Typography } from "@mui/material";
+
+type TBPlanDetailsProps = {};
+export default function TBPlanDetailsPage({}: TBPlanDetailsProps) {
   const params = useParams();
   const id = params.id as string;
   const [qrCodeUrl, setQrCodeUrl] = useState("");
@@ -33,13 +34,13 @@ export default function PlanDetailsPage({}: PlanDetailsProps) {
           },
         );
         setDetails(details);
-      } catch (error: any) {
+      } catch (error: unknown) {
         showError(error || "Không thể tải dữ liệu");
       } finally {
         setIsLoading(false);
       }
     },
-    [id],
+    [id, setIsLoading, showError],
   );
 
   const getQrCodeUrl = async (id: string) => {
@@ -72,8 +73,8 @@ export default function PlanDetailsPage({}: PlanDetailsProps) {
     }
   };
 
-  const handleAccessCodeChange = (e: any) => {
-    const accessCode = (e.target as HTMLInputElement)?.value ?? "";
+  const handleAccessCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const accessCode = e.target?.value ?? "";
     setAccessCode(accessCode);
   };
 
@@ -82,25 +83,33 @@ export default function PlanDetailsPage({}: PlanDetailsProps) {
       initQRCode(id);
       fetchPlanDetails();
     }
-  }, [fetchPlanDetails]);
+  }, [id, fetchPlanDetails]);
 
   return (
-    <MainLayout hideButton={true}>
+    <TBMainLayout hideButton={true}>
       {details && (
-        <div className="mt-10 mt-20 md:p-0 px-4">
+        <Box sx={{ mt: { xs: 10, md: 10 }, px: { xs: 2, md: 0 } }}>
           {!details.canView && (
-            <div className="flex flex-col items-center gap-2 md:mx-auto w-full md:w-90">
+            <Stack
+              spacing={2}
+              alignItems="center"
+              sx={{ mx: "auto", width: "100%", maxWidth: { md: 360 } }}
+            >
               {qrCodeUrl && (
-                <img
+                <Box
+                  component="img"
                   src={qrCodeUrl}
                   alt="qr"
-                  className="w-16 md:w-40 h-16 md:h-40"
+                  sx={{
+                    width: { xs: 64, md: 160 },
+                    height: { xs: 64, md: 160 },
+                  }}
                 />
               )}
-              <p className="font-medium text-red-600">
+              <Typography fontWeight={500} color="error.main">
                 Đây là lịch trình riêng tư
-              </p>
-              <Input
+              </Typography>
+              <TBInput
                 id="accessCode"
                 type="password"
                 label="Mã bảo vệ"
@@ -109,38 +118,52 @@ export default function PlanDetailsPage({}: PlanDetailsProps) {
                 value={accessCode}
                 onChange={handleAccessCodeChange}
               />
-              <div className="flex items-end">
-                <Button type="button" onClick={onSubmit}>
+              <Stack direction="row" alignItems="flex-end">
+                <TBButton type="button" onClick={onSubmit}>
                   Xem chi tiết
-                </Button>
-              </div>
-            </div>
+                </TBButton>
+              </Stack>
+            </Stack>
           )}
           {!isLoading && details.canView && (
             <>
-              <div className="flex flex-col gap-2 py-2 md:py-5">
-                <h4 className="block font-bold text-amber-500 text-xl md:text-4xl">
+              <Stack spacing={1} sx={{ py: { xs: 1, md: 3 } }}>
+                <Typography
+                  variant="h4"
+                  fontWeight="bold"
+                  color="primary.main"
+                  sx={{ fontSize: { xs: "1.25rem", md: "2.125rem" } }}
+                >
                   {details["title"]}
-                </h4>
-                <p className="block font-thin text-gray-500">
+                </Typography>
+                <Typography
+                  variant="body1"
+                  color="text.secondary"
+                  fontWeight={300}
+                >
                   A relaxing beach vacation with college friends
-                </p>
-              </div>
+                </Typography>
+              </Stack>
 
-              <div className="gap-3 grid md:grid-cols-2 lg:grid-cols-3 mt-3">
+              <Box
+                sx={{
+                  display: "grid",
+                  gap: 2,
+                  mt: 2,
+                  gridTemplateColumns: { xs: "1fr", md: "repeat(2, 1fr)" },
+                }}
+              >
                 {(details?.destinations ?? []).map((destination) => (
-                  <DestinationCard
-                    key={destination.codeName}
-                    destination={destination}
-                    readonly={true}
-                    version="v2"
+                  <TbItineraryLocation
+                    key={destination.id}
+                    destination={destination as TBDestinationV2Model}
                   />
                 ))}
-              </div>
+              </Box>
             </>
           )}
-        </div>
+        </Box>
       )}
-    </MainLayout>
+    </TBMainLayout>
   );
 }
