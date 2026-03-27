@@ -424,7 +424,7 @@ export default function TBTripBuilderPage() {
 
   return (
     <TBMainLayout hideButton>
-      <Stack mt={4} spacing={4}>
+      <Stack mt={6} spacing={4}>
         <TBSetUpSite tripData={tripData} onSetupSiteChange={setTripData} />
         <TBScheduleSite
           schedule={schedule}
