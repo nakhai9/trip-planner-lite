@@ -1,11 +1,13 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import MainLayout from "./ui/layout/MainLayout";
-import { useGlobalStore } from "./store/global-store";
-import Button from "./ui/button";
+import TBMainLayout from "@/app/ui/layout/TBMainLayout";
+import TBButton from "@/app/ui/TBButton";
+import { useGlobalStore } from "@/app/store/global-store";
+import { Card, CardContent, Stack, Typography } from "@mui/material";
 
-export default function Home() {
+
+export default function TBHomePage() {
   const router = useRouter();
   const { setIsLoading } = useGlobalStore();
 
@@ -17,29 +19,55 @@ export default function Home() {
   };
 
   return (
-    <MainLayout hideButton={true}>
-      <div className="gap-5 grid md:grid-cols-4 grid-col mt-40 p-4 md:p-0">
-        <div></div>
-        <div className="flex flex-col gap-2 shadow-lg p-4 border border-slate-100 hover:border-amber-500 rounded-md">
-          <h3 className="font-medium app-text-primary text-lg">
-            Tạo hành trình
-          </h3>
-          <p className="h-16 text-xs md:text-sm">
-            Dễ dàng lên kế hoạch cá nhân/nhóm cho những chuyến du lịch
-          </p>
-          <Button onClick={() => navigateToPage("/lich-trinh")}>Bắt đầu</Button>
-        </div>
-        <div className="flex flex-col gap-2 shadow-lg p-4 border border-slate-100 hover:border-amber-500 rounded-md">
-          <h3 className="font-medium app-text-primary text-lg">Chia sẻ</h3>
-          <p className="h-16 text-xs md:text-sm">
-            Tạo và chia sẻ hành trình những nơi đã đi qua dưới dạng hình ảnh
-          </p>
-          <Button onClick={() => navigateToPage("/chia-se-hinh-anh")}>
-            Bắt đầu
-          </Button>
-        </div>
-        <div></div>
-      </div>
-    </MainLayout>
+    <TBMainLayout hideButton={true}>
+      <Stack
+        direction={{ xs: "column", md: "row" }}
+        spacing={3}
+        justifyContent="center"
+        alignItems="stretch"
+        sx={{ mt: { xs: 12, md: 20 }, px: { xs: 2, md: 0 } }}
+      >
+        <Card
+          variant="outlined"
+          sx={{
+            maxWidth: { md: 280 },
+            width: "100%",
+            borderColor: "grey.200",
+            "&:hover": { borderColor: "primary.main" },
+          }}
+        >
+          <CardContent sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+            <Typography color="primary" fontWeight={500} variant="h6">
+              Tạo hành trình
+            </Typography>
+            <Typography variant="body2" sx={{ minHeight: 64 }}>
+              Dễ dàng lên kế hoạch cá nhân/nhóm cho những chuyến du lịch
+            </Typography>
+            <TBButton onClick={() => navigateToPage("/lich-trinh")}>Bắt đầu</TBButton>
+          </CardContent>
+        </Card>
+        <Card
+          variant="outlined"
+          sx={{
+            maxWidth: { md: 280 },
+            width: "100%",
+            borderColor: "grey.200",
+            "&:hover": { borderColor: "primary.main" },
+          }}
+        >
+          <CardContent sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+            <Typography color="primary" fontWeight={500} variant="h6">
+              Chia sẻ
+            </Typography>
+            <Typography variant="body2" sx={{ minHeight: 64 }}>
+              Tạo và chia sẻ hành trình những nơi đã đi qua dưới dạng hình ảnh
+            </Typography>
+            <TBButton onClick={() => navigateToPage("/chia-se-hinh-anh")}>
+              Bắt đầu
+            </TBButton>
+          </CardContent>
+        </Card>
+      </Stack>
+    </TBMainLayout>
   );
 }

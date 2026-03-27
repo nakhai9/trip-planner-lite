@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Button,
   Dialog,
@@ -7,12 +9,7 @@ import {
   DialogTitle,
 } from "@mui/material";
 
-type ModalProps = {
-  isOpen: boolean;
-  onClose: () => void;
-  children?: React.ReactNode;
-};
-export default function Modal() {
+export default function TBModal() {
   return (
     <Dialog open={true}>
       <DialogTitle>Vinh Rau</DialogTitle>
