@@ -2,19 +2,19 @@
 
 import React, { useState, useEffect } from "react";
 
-import TBMainLayout from "@/app/ui/layout/TBMainLayout";
-import TBTabs, { type TBTab } from "@/app/ui/TBTabs";
+import TBMainLayout from "@/app/components/layout/TBMainLayout";
+import TBTabs, { type TBTab } from "@/app/components/ui/TBTabs";
 import TbItineraryLocation from "@/app/components/Itinerary/TbItineraryLocation";
 import type { ItineraryLocation as TBDestinationV2Model } from "@/app/components/Itinerary/TbItineraryLocation";
-import TBButton from "@/app/ui/TBButton";
+import TBButton from "@/app/components/ui/TBButton";
 import { Utils } from "@/app/libs/utils";
 import { Checkbox, FormControlLabel, IconButton, Paper } from "@mui/material";
-import TBInput from "@/app/ui/TBInput";
+import TBInput from "@/app/components/ui/TBInput";
 import { ArrowLeft, Calendar1, Pencil, Sparkles } from "lucide-react";
 import { Box, Stack, Typography } from "@mui/material";
 import { useGlobalStore, useToast } from "@/app/store/global-store";
 import _ from "lodash";
-import TBIconButton from "@/app/ui/TBIconButton";
+import TBIconButton from "@/app/components/ui/TBIconButton";
 import { HttpClient } from "@/app/libs/api/axios";
 import { API_URLS } from "@/app/libs/api/api.constant";
 import { useRouter } from "next/navigation";

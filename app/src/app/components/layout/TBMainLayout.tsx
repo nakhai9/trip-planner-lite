@@ -14,9 +14,9 @@ import {
   Typography,
 } from "@mui/material";
 import { Map } from "lucide-react";
-import TBToast from "../TBToast";
+import TBToast from "../ui/TBToast";
 import { useRouter } from "next/navigation";
-import TBButton from "../TBButton";
+import TBButton from "../ui/TBButton";
 import { LAYOUT_WIDTH_RESPONSIVE } from "@/app/providers";
 
 const styles = {
@@ -29,7 +29,7 @@ const styles = {
     bgcolor: "background.default",
   },
   appBar: {
-    bgcolor: "background.paper",
+    bgcolor: "background.default",
     color: "text.primary",
     zIndex: (t: any) => t.zIndex.drawer + 1,
   },
@@ -44,12 +44,11 @@ const styles = {
   },
   logo: {
     bgcolor: "primary.main",
-    color: "primary.contrastText",
+    color: "text.primary",
     px: { xs: 2, md: 1 },
     py: { xs: 1, md: 0 },
     fontWeight: 500,
     fontSize: { xs: "1.25rem", md: "1.875rem" },
-    fontStyle: "italic",
     cursor: "pointer",
     textAlign: { xs: "center", md: "left" },
   },
@@ -100,7 +99,7 @@ export default function TBMainLayout({
             onClick={() => router.push("/")}
             sx={styles.logo}
           >
-            TripBuilder
+            Tripbuilder
           </Typography>
 
           {!hideButton && (

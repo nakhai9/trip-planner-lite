@@ -8,7 +8,7 @@ import {
 import debounce from "lodash/debounce";
 import { LookupItem } from "../libs/types/common";
 import { Map } from "lucide-react";
-import TBInput from "../ui/TBInput";
+import TBInput from "./ui/TBInput";
 
 type TbLocationSearchProps = {
   variant?: "outlined" | "filled" | "standard";

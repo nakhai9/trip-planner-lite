@@ -1,11 +1,10 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import TBMainLayout from "@/app/ui/layout/TBMainLayout";
-import TBButton from "@/app/ui/TBButton";
+import TBMainLayout from "@/app/components/layout/TBMainLayout";
+import TBButton from "@/app/components/ui/TBButton";
 import { useGlobalStore } from "@/app/store/global-store";
 import { Card, CardContent, Stack, Typography } from "@mui/material";
-
 
 export default function TBHomePage() {
   const router = useRouter();
@@ -36,14 +35,18 @@ export default function TBHomePage() {
             "&:hover": { borderColor: "primary.main" },
           }}
         >
-          <CardContent sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+          <CardContent
+            sx={{ display: "flex", flexDirection: "column", gap: 1 }}
+          >
             <Typography color="primary" fontWeight={500} variant="h6">
               Tạo hành trình
             </Typography>
             <Typography variant="body2" sx={{ minHeight: 64 }}>
               Dễ dàng lên kế hoạch cá nhân/nhóm cho những chuyến du lịch
             </Typography>
-            <TBButton onClick={() => navigateToPage("/lich-trinh")}>Bắt đầu</TBButton>
+            <TBButton onClick={() => navigateToPage("/lich-trinh")}>
+              Bắt đầu
+            </TBButton>
           </CardContent>
         </Card>
         <Card
@@ -55,7 +58,9 @@ export default function TBHomePage() {
             "&:hover": { borderColor: "primary.main" },
           }}
         >
-          <CardContent sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+          <CardContent
+            sx={{ display: "flex", flexDirection: "column", gap: 1 }}
+          >
             <Typography color="primary" fontWeight={500} variant="h6">
               Chia sẻ
             </Typography>

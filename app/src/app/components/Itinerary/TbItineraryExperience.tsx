@@ -1,8 +1,8 @@
 "use client";
-import TBInput from "@/app/ui/TBInput";
+import TBInput from "@/app/components/ui/TBInput";
 import { Box, Stack } from "@mui/material";
 import TbLocationSearch from "../TbLocationSearch";
-import TBIconButton from "@/app/ui/TBIconButton";
+import TBIconButton from "@/app/components/ui/TBIconButton";
 import { PlusCircle, XCircle } from "lucide-react";
 import { Utils } from "@/app/libs/utils";
 import { useState } from "react";

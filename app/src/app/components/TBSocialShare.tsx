@@ -6,7 +6,7 @@ import {
   ThreadsIcon,
   ThreadsShareButton,
 } from "react-share";
-import TBInput from "../ui/TBInput";
+import TBInput from "./ui/TBInput";
 import { Box, Stack, Typography } from "@mui/material";
 
 type TBSocialShareProps = {
@@ -27,7 +27,12 @@ export default function TBSocialShare({
         />
       </Stack>
 
-      <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2, mt: 1 }}>
+      <Stack
+        direction="row"
+        alignItems="center"
+        spacing={1}
+        sx={{ mb: 2, mt: 1 }}
+      >
         <Typography variant="body2" color="text.secondary" sx={{ mb: 0 }}>
           Chia sẻ
         </Typography>

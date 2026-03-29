@@ -1,5 +1,5 @@
 "use client";
-import TBMainLayout from "@/app/ui/layout/TBMainLayout";
+import TBMainLayout from "@/app/components/layout/TBMainLayout";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import QRCode from "qrcode";
@@ -7,8 +7,8 @@ import { useGlobalStore, useToast } from "@/app/store/global-store";
 import { API_URLS } from "@/app/libs/api/api.constant";
 import { HttpClient } from "@/app/libs/api/axios";
 import { PlanDetails } from "@/app/model";
-import TBButton from "@/app/ui/TBButton";
-import TBInput from "@/app/ui/TBInput";
+import TBButton from "@/app/components/ui/TBButton";
+import TBInput from "@/app/components/ui/TBInput";
 import TbItineraryLocation from "@/app/components/Itinerary/TbItineraryLocation";
 import type { ItineraryLocation as TBDestinationV2Model } from "@/app/components/Itinerary/TbItineraryLocation";
 import { Box, Stack, Typography } from "@mui/material";

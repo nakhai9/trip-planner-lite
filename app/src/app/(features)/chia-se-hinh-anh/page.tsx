@@ -6,9 +6,9 @@ import { HttpClient } from "@/app/libs/api/axios";
 import { LocationInfo } from "@/app/model";
 import { useGlobalStore, useToast } from "@/app/store/global-store";
 import { useVietnamMapStore } from "@/app/store/vietnam-map-store";
-import TBMainLayout from "@/app/ui/layout/TBMainLayout";
-import TBButton from "@/app/ui/TBButton";
-import TBIconButton from "@/app/ui/TBIconButton";
+import TBMainLayout from "@/app/components/layout/TBMainLayout";
+import TBButton from "@/app/components/ui/TBButton";
+import TBIconButton from "@/app/components/ui/TBIconButton";
 import {
   Dialog,
   DialogContent,
@@ -143,13 +143,24 @@ export default function TBChiaSeHinhAnhPage() {
   return (
     <TBMainLayout hideButton={false}>
       <Stack sx={{ mt: 10, px: { xs: 2, md: 0 } }}>
-        <Stack direction="row" justifyContent="flex-end" alignItems="center" spacing={1} flexWrap="wrap">
+        <Stack
+          direction="row"
+          justifyContent="flex-end"
+          alignItems="center"
+          spacing={1}
+          flexWrap="wrap"
+        >
           {selectedLocationsToShare.filter((x) => x.status === "UPCOMING")
             .length > 0 && (
             <Tooltip title="Tạo lịch trình">
               <TBButton
                 onClick={() => navigateToPage("/lich-trinh")}
-                sx={{ "& svg": { width: { xs: 16, md: 20 }, height: { xs: 16, md: 20 } } }}
+                sx={{
+                  "& svg": {
+                    width: { xs: 16, md: 20 },
+                    height: { xs: 16, md: 20 },
+                  },
+                }}
                 leftIcon={<MapPinned />}
               >
                 Tạo lịch trình
@@ -161,7 +172,12 @@ export default function TBChiaSeHinhAnhPage() {
               <Tooltip title="Tạo hình ảnh để chia sẻ">
                 <TBButton
                   onClick={onShareModal}
-                  sx={{ "& svg": { width: { xs: 16, md: 20 }, height: { xs: 16, md: 20 } } }}
+                  sx={{
+                    "& svg": {
+                      width: { xs: 16, md: 20 },
+                      height: { xs: 16, md: 20 },
+                    },
+                  }}
                   leftIcon={<Share2 />}
                 >
                   Chia sẻ lên mạng xã hội
@@ -171,7 +187,13 @@ export default function TBChiaSeHinhAnhPage() {
                 <TBButton
                   variant="outline"
                   onClick={resetSelectedLocationsToShare}
-                  sx={{ minWidth: 48, "& svg": { width: { xs: 16, md: 20 }, height: { xs: 16, md: 20 } } }}
+                  sx={{
+                    minWidth: 48,
+                    "& svg": {
+                      width: { xs: 16, md: 20 },
+                      height: { xs: 16, md: 20 },
+                    },
+                  }}
                   leftIcon={<RotateCw />}
                 />
               </Tooltip>
@@ -183,7 +205,13 @@ export default function TBChiaSeHinhAnhPage() {
           onChoose={(location) => handleChooseLocation(location)}
         />
       </Stack>
-      <Dialog open={open} onClose={() => setOpen(false)} keepMounted maxWidth="sm" fullWidth>
+      <Dialog
+        open={open}
+        onClose={() => setOpen(false)}
+        keepMounted
+        maxWidth="sm"
+        fullWidth
+      >
         <DialogTitle
           sx={{
             display: "flex",
@@ -213,7 +241,11 @@ export default function TBChiaSeHinhAnhPage() {
               >
                 {location?.name ?? "-"}
               </Typography>
-              <Stack direction="row" justifyContent="center" spacing={{ xs: 3, md: 5 }}>
+              <Stack
+                direction="row"
+                justifyContent="center"
+                spacing={{ xs: 3, md: 5 }}
+              >
                 {location?.status !== "UPCOMING" && (
                   <Stack
                     component="button"
@@ -227,7 +259,9 @@ export default function TBChiaSeHinhAnhPage() {
                       cursor: "pointer",
                       p: 0,
                       color:
-                        location?.status === "VISITED" ? visitedColor : "inherit",
+                        location?.status === "VISITED"
+                          ? visitedColor
+                          : "inherit",
                     }}
                   >
                     <Flag />
@@ -247,7 +281,9 @@ export default function TBChiaSeHinhAnhPage() {
                       cursor: "pointer",
                       p: 0,
                       color:
-                        location?.status === "UPCOMING" ? upcomingColor : "inherit",
+                        location?.status === "UPCOMING"
+                          ? upcomingColor
+                          : "inherit",
                     }}
                   >
                     <Footprints />

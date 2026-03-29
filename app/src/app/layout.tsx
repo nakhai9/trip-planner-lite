@@ -4,7 +4,7 @@ import type { Viewport } from "next";
 import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "./globals.scss";
-import TBMainLayout from "@/app/ui/layout/TBMainLayout";
+import TBMainLayout from "@/app/components/layout/TBMainLayout";
 import { TBProviders } from "@/app/providers";
 
 const geistSans = Geist({
@@ -37,9 +37,7 @@ export default function TBRootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <TBProviders>
-          <TBMainLayout>{children}</TBMainLayout>
-        </TBProviders>
+        <TBProviders>{children}</TBProviders>
       </body>
     </html>
   );

@@ -19,7 +19,7 @@ import {
   TreePalm,
   X,
 } from "lucide-react";
-import TBIconButton from "../../ui/TBIconButton";
+import TBIconButton from "../ui/TBIconButton";
 import { useCallback, useRef, useState } from "react";
 import { useGlobalStore, useToast } from "../../store/global-store";
 import { useVietnamMapStore } from "../../store/vietnam-map-store";
