@@ -21,16 +21,6 @@ import { useRouter } from "next/navigation";
 import { ResponseId } from "@/app/libs/api/api.models";
 
 const styles = {
-  mainSite: {
-    container: {
-      mt: 10,
-      px: { xs: 1, md: 0 },
-    },
-    navigate: {
-      my: 5,
-    },
-  },
-
   setupSite: {
     card: {
       p: 4,
@@ -402,11 +392,12 @@ export default function TBTripBuilderPage() {
       });
 
       router.push("/lich-trinh/" + data.id);
+      showSuccess("Tạo hành trình thành công");
     } catch (error) {
       showError(error);
     } finally {
       setIsLoading(false);
-      showSuccess("Tạo hành trình thành công");
+      //
     }
   };
 

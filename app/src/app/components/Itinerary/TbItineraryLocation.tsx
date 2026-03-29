@@ -239,7 +239,9 @@ export default function TbItineraryLocation({
                         sx={styles.mapLink}
                       >
                         <Map size={14} />
-                        <Typography variant="caption">Địa chỉ</Typography>
+                        <Typography variant="caption">
+                          {exp.address || "Địa chỉ"}
+                        </Typography>
                       </Stack>
 
                       <Stack

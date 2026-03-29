@@ -27,6 +27,7 @@ export default function TbItineraryExperience({
 }: TbItineraryExperienceProps) {
   const [value, setValue] = useState<string>("");
   const [location, setLocation] = useState<LookupItem | null>(null);
+  const [locationInput, setLocationInput] = useState<string>("");
   const { showError } = useToast();
 
   const handleChange = () => {
@@ -34,9 +35,10 @@ export default function TbItineraryExperience({
       showError("Trường hoạt động, điểm tham quan không được trống");
       return;
     }
+    console.log("locationInput", locationInput);
     onChange?.({
       name: value,
-      address: location ? location.label : "",
+      address: location ? location.label : locationInput ? locationInput : "",
       objectId: data ? data.objectId : Utils.random.uuid(),
     });
     onReset();
@@ -56,6 +58,10 @@ export default function TbItineraryExperience({
     setLocation(null);
   };
 
+  const handleInputLocationChange = (text: string) => {
+    setLocationInput(text);
+  };
+
   return (
     <Stack direction="column" spacing={3}>
       <TBInput
@@ -68,6 +74,7 @@ export default function TbItineraryExperience({
       <TbLocationSearch
         variant="standard"
         onChange={(selected) => handleLocationChange(selected)}
+        onInputChange={(text) => handleInputLocationChange(text)}
       />
       <Box
         sx={{
@@ -79,9 +86,9 @@ export default function TbItineraryExperience({
         <TBIconButton type="button" onClick={handleChange}>
           <PlusCircle size={20} />
         </TBIconButton>
-        <TBIconButton type="button">
+        {/* <TBIconButton type="button">
           <XCircle size={20} />
-        </TBIconButton>
+        </TBIconButton> */}
       </Box>
     </Stack>
   );

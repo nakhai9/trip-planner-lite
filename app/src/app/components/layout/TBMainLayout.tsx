@@ -32,11 +32,12 @@ const styles = {
     bgcolor: "background.default",
     color: "text.primary",
     zIndex: (t: any) => t.zIndex.drawer + 1,
+    minHeight: { sm: 14, md: 16 },
   },
   toolbar: {
     justifyContent: { xs: "center", md: "space-between" },
     gap: 2,
-    maxWidth: { md: 672, lg: 1152 },
+    maxWidth: { ...LAYOUT_WIDTH_RESPONSIVE },
     width: "100%",
     mx: "auto",
     px: { xs: 2, md: 0 },
@@ -44,8 +45,8 @@ const styles = {
   },
   logo: {
     bgcolor: "primary.main",
-    color: "text.primary",
-    px: { xs: 2, md: 1 },
+    color: "text.default",
+    px: { xs: 2, md: 2 },
     py: { xs: 1, md: 0 },
     fontWeight: 500,
     fontSize: { xs: "1.25rem", md: "1.875rem" },
@@ -56,7 +57,7 @@ const styles = {
     ...(d ? { opacity: 0.5, pointerEvents: "none" } : {}),
     "& svg": { width: { xs: 16, md: 20 }, height: { xs: 16, md: 20 } },
   }),
-  main: { flex: 1, pt: 7 },
+  main: { flex: 1, pt: { sm: 14, md: 16 }, bgColor: "red !important" },
   container: {
     maxWidth: { ...LAYOUT_WIDTH_RESPONSIVE },
     mx: "auto",

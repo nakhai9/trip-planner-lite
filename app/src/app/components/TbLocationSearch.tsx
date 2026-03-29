@@ -13,11 +13,13 @@ import TBInput from "./ui/TBInput";
 type TbLocationSearchProps = {
   variant?: "outlined" | "filled" | "standard";
   onChange?: (value: LookupItem | null) => void;
+  onInputChange?: (value: string) => void;
 };
 
 export default function TbLocationSearch({
   variant = "outlined",
   onChange,
+  onInputChange,
 }: TbLocationSearchProps) {
   const [options, setOptions] = useState<LookupItem[]>([]);
   const [inputValue, setInputValue] = useState("");
@@ -89,6 +91,7 @@ export default function TbLocationSearch({
       inputValue={inputValue}
       onInputChange={(_, newInputValue) => {
         setInputValue(newInputValue);
+        onInputChange?.(newInputValue);
       }}
       options={options}
       loading={loading}
@@ -120,7 +123,6 @@ export default function TbLocationSearch({
       )}
       noOptionsText="Không tìm thấy địa chỉ phù hợp"
       loadingText="Đang tìm kiếm..."
-      clearOnBlur
       selectOnFocus
       openOnFocus={false} // tránh mở popup rỗng khi focus
       filterOptions={(x) => x}

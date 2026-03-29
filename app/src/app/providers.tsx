@@ -5,33 +5,62 @@ import { AppRouterCacheProvider } from "@mui/material-nextjs/v16-appRouter";
 import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 
-const theme = createTheme({
+declare module "@mui/material/styles" {
+  interface TypeText {
+    default: string;
+  }
+}
+
+const colors = {
+  backgroundDefault: "#F4F4F4",
+  primaryMain: "#FF7315",
+  textSecondary: "#3A3535",
+  textPrimary: "#232020",
+  contrastText: "#FFFFFF",
+  error: "#DD0303",
+};
+
+export const theme = createTheme({
   palette: {
-    mode: "light",
-    primary: { main: "#d97706" },
-    secondary: { main: "#f59e0b" },
-    error: { main: "#dc2626" },
     background: {
-      default: "#f8fbff",
-      paper: "#ffffff",
+      default: colors.backgroundDefault,
     },
     text: {
-      primary: "#0f172a", // 👈 màu chữ chính (khuyên dùng)
-      secondary: "#475569", // 👈 chữ phụ
+      primary: colors.textPrimary,
+      secondary: colors.textSecondary,
+      default: "#fff", // custom
+    },
+    primary: {
+      main: colors.primaryMain,
+      contrastText: colors.contrastText,
+    },
+    grey: {
+      500: colors.textSecondary,
+      900: colors.textPrimary,
+    },
+    error: {
+      main: colors.error,
     },
   },
-  spacing: 4,
+
   typography: {
-    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-    h1: { fontWeight: 700, letterSpacing: "-0.02em" },
-    h2: { fontWeight: 700, letterSpacing: "-0.01em" },
-    h3: { fontWeight: 600 },
-    button: { textTransform: "none", fontWeight: 600 },
+    allVariants: {
+      color: colors.textPrimary,
+    },
   },
+
+  spacing: 4,
   shape: { borderRadius: 8 },
+
   components: {
     MuiButton: {
-      defaultProps: { disableElevation: true },
+      styleOverrides: {
+        root: {
+          textTransform: "none",
+          borderRadius: 8,
+          padding: "8px 16px",
+        },
+      },
     },
   },
 });
