@@ -15,6 +15,7 @@ import {
   Map,
   MapPin,
   Pencil,
+  PlusCircle,
   Trash2,
   TreePalm,
   X,
@@ -27,7 +28,12 @@ import { Province } from "../../model";
 import { HttpClient } from "../../libs/api/axios";
 import { API_URLS } from "../../libs/api/api.constant";
 import TbItineraryExperience, { Experience } from "./TbItineraryExperience";
+import dynamic from "next/dynamic";
 
+const TbOpenStreetMapView = dynamic(
+  () => import("./../../components/TbOpenStreetMapView"),
+  { ssr: false },
+);
 const styles = {
   paper: { width: "100%", overflow: "hidden" },
   headerSite: {
@@ -39,10 +45,11 @@ const styles = {
 
   inputsSite: { py: 3, px: 5 },
 
+  actions: { display: "flex", justifyContent: "center", py: 2 },
+
   contentSite: {},
 
   locationTrigger: (hasActivities: boolean) => ({
-    color: "primary.main",
     cursor: hasActivities ? "default" : "pointer",
     pointerEvents: hasActivities ? "none" : "auto",
   }),
@@ -55,7 +62,7 @@ const styles = {
     width: "100%",
   },
 
-  mapLink: { color: "info.main", fontSize: "0.75rem" },
+  mapLink: { color: "info.main", cursor: "pointer" },
   deleteAction: { color: "error.main", fontSize: "0.75rem", cursor: "pointer" },
 
   dialogTitle: {
@@ -85,7 +92,7 @@ function EmptySite({ destination }: EmptySiteProps) {
       <TreePalm color="#e46767" size={40} />
 
       <Typography variant="body2" color="text.secondary" textAlign="center">
-        Không có hoạt động
+        Chưa có hoạt động
       </Typography>
     </Stack>
   );
@@ -139,6 +146,13 @@ export default function TbItineraryLocation({
   const [modalKey, setModalKey] = useState<TBDestinationV2ModalKey>("list");
   const [open, setOpen] = useState<boolean>(false);
   const toggleModal = () => setOpen(!open);
+  const [showExperienceForm, setShowExperienceForm] = useState<boolean>(false);
+  const { showError } = useToast();
+
+  const [coordinate, setCoordinate] = useState<{
+    longitude: number;
+    latitude: number;
+  } | null>(null);
 
   const { provinces, fetchProvinces } = useProvinces();
 
@@ -158,6 +172,7 @@ export default function TbItineraryLocation({
   };
 
   const handleItineraryExperienceChange = (data: Experience) => {
+    setShowExperienceForm(false);
     onChangeDestination?.({
       ...destination,
       experiences: [...destination.experiences, data],
@@ -166,6 +181,12 @@ export default function TbItineraryLocation({
 
   return (
     <>
+      {coordinate && (
+        <TbOpenStreetMapView
+          latitude={coordinate.latitude}
+          longitude={coordinate.longitude}
+        />
+      )}
       <Paper elevation={3} sx={styles.paper}>
         <Box sx={styles.headerSite}>
           <Stack
@@ -182,7 +203,7 @@ export default function TbItineraryLocation({
               }
               sx={styles.locationTrigger(!!destination.experiences.length)}
             >
-              <MapPin size={16} />
+              <MapPin size={18} />
               <Typography component="span">
                 {destination.codeName === "UNSET"
                   ? "Địa chỉ (thay đổi)"
@@ -191,6 +212,15 @@ export default function TbItineraryLocation({
             </Stack>
 
             <Stack direction="row" spacing={0.5}>
+              {destination.codeName !== "UNSET" && !showExperienceForm && (
+                <TBIconButton
+                  type="button"
+                  onClick={() => setShowExperienceForm(true)}
+                >
+                  <PlusCircle size={18} />
+                </TBIconButton>
+              )}
+
               {onDelete && (
                 <TBIconButton
                   onClick={() => onDelete(destination)}
@@ -200,18 +230,15 @@ export default function TbItineraryLocation({
                   <Trash2 size={18} />
                 </TBIconButton>
               )}
-
-              <TBIconButton sx={styles.editBtn} type="button">
-                <Pencil size={18} />
-              </TBIconButton>
             </Stack>
           </Stack>
         </Box>
         <Box sx={styles.contentSite}>
-          {destination.codeName !== "UNSET" && (
+          {showExperienceForm && (
             <Box sx={styles.inputsSite}>
               <TbItineraryExperience
                 onChange={(data) => handleItineraryExperienceChange(data)}
+                onClickXButton={() => setShowExperienceForm(false)}
               />
             </Box>
           )}
@@ -237,10 +264,23 @@ export default function TbItineraryLocation({
                         alignItems="center"
                         spacing={0.5}
                         sx={styles.mapLink}
+                        onClick={() => {
+                          const coordinates = exp.coordinates;
+                          if (!coordinates || coordinates.length !== 2) {
+                            showError("Kinh độ và vĩ độ không hợp lệ");
+                            return;
+                          }
+
+                          setCoordinate({
+                            latitude: Number(coordinates[0]),
+                            longitude: Number(coordinates[1]),
+                          });
+                        }}
                       >
                         <Map size={14} />
                         <Typography variant="caption">
-                          {exp.address || "Địa chỉ"}
+                          {/* {exp.address || "Địa chỉ"} */}
+                          Xem bản đồ
                         </Typography>
                       </Stack>
 

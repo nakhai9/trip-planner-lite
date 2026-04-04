@@ -2,7 +2,7 @@
 import TBVietnamMap from "./TBVietnamMap";
 import { LocationInfo } from "../model";
 import { Box } from "@mui/material";
-
+import "leaflet/dist/leaflet.css";
 type TBMapViewerProps = {
   locations: LocationInfo[];
   onChoose?: (location: LocationInfo) => void;

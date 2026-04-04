@@ -37,7 +37,7 @@ export default function TbLocationSearch({
       const response = await fetch(
         `https://api.geoapify.com/v1/geocode/autocomplete?text=${encodeURIComponent(
           searchTerm.trim(),
-        )}&apiKey=ed624b0b709f4d47a6648b2c9dd7cb63`,
+        )}&apiKey=ed624b0b709f4d47a6648b2c9dd7cb63&lang=vi`,
       );
 
       const data = await response.json();
@@ -45,7 +45,7 @@ export default function TbLocationSearch({
       const mappedOptions: LookupItem[] =
         data?.features?.map((x: any) => ({
           label: x.properties.formatted,
-          value: x.properties.formatted, // bạn có thể thay bằng place_id nếu muốn unique hơn
+          value: `[${x.geometry.coordinates[1]}, ${x.geometry.coordinates[0]}]`,
         })) || [];
 
       setOptions(mappedOptions);

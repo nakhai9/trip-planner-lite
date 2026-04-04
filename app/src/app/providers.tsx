@@ -4,6 +4,8 @@ import type { ReactNode } from "react";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v16-appRouter";
 import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 declare module "@mui/material/styles" {
   interface TypeText {
@@ -12,7 +14,7 @@ declare module "@mui/material/styles" {
 }
 
 const colors = {
-  backgroundDefault: "#F4F4F4",
+  backgroundDefault: "#F4F6FF",
   primaryMain: "#FF7315",
   textSecondary: "#3A3535",
   textPrimary: "#232020",
@@ -74,8 +76,10 @@ export function TBProviders({ children }: { children: ReactNode }) {
   return (
     <AppRouterCacheProvider options={{ key: "mui", enableCssLayer: true }}>
       <ThemeProvider theme={theme}>
-        <CssBaseline />
-        {children}
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <CssBaseline />
+          {children}
+        </LocalizationProvider>
       </ThemeProvider>
     </AppRouterCacheProvider>
   );

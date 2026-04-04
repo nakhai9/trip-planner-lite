@@ -28,40 +28,44 @@ const styles = {
     fontFamily: "inherit",
     bgcolor: "background.default",
   },
+
   appBar: {
-    bgcolor: "background.default",
+    position: "fixed",
+    bgcolor: "background.paper",
     color: "text.primary",
-    zIndex: (t: any) => t.zIndex.drawer + 1,
-    minHeight: { sm: 14, md: 16 },
+    borderBottom: 1,
+    borderColor: "divider",
+    boxShadow: "none",
   },
-  toolbar: {
-    justifyContent: { xs: "center", md: "space-between" },
-    gap: 2,
+
+  appBarToolbar: {
     maxWidth: { ...LAYOUT_WIDTH_RESPONSIVE },
-    width: "100%",
     mx: "auto",
-    px: { xs: 2, md: 0 },
-    minHeight: 56,
+    width: "100%",
+    textAlign: "center",
+    minHeight: { xs: 56, sm: 64 },
   },
-  logo: {
-    bgcolor: "primary.main",
-    color: "text.default",
-    px: { xs: 2, md: 2 },
-    py: { xs: 1, md: 0 },
-    fontWeight: 500,
-    fontSize: { xs: "1.25rem", md: "1.875rem" },
+
+  appBarTitle: {
     cursor: "pointer",
-    textAlign: { xs: "center", md: "left" },
+    fontWeight: 500,
+    flexShrink: 0,
+    backgroundColor: "primary.main",
+    color: "text.default",
+    px: 4,
+    py: 1,
   },
-  button: (d: boolean) => ({
-    ...(d ? { opacity: 0.5, pointerEvents: "none" } : {}),
-    "& svg": { width: { xs: 16, md: 20 }, height: { xs: 16, md: 20 } },
-  }),
-  main: { flex: 1, pt: { sm: 14, md: 16 }, bgColor: "red !important" },
+
+  main: { flex: 1 },
   container: {
     maxWidth: { ...LAYOUT_WIDTH_RESPONSIVE },
     mx: "auto",
     width: "100%",
+    px: {
+      xs: 4,
+      md: 0,
+      lg: 0,
+    },
   },
   backdrop: { zIndex: 9999 },
   loadingText: {
@@ -93,43 +97,36 @@ export default function TBMainLayout({
 
   return (
     <Box sx={styles.root}>
-      <AppBar position="fixed" elevation={2} sx={styles.appBar}>
-        <Toolbar sx={styles.toolbar}>
+      <AppBar component="nav" elevation={0} sx={styles.appBar}>
+        <Toolbar sx={styles.appBarToolbar} disableGutters>
           <Typography
-            component="h1"
+            variant="h6"
             onClick={() => router.push("/")}
-            sx={styles.logo}
+            sx={styles.appBarTitle}
           >
-            Tripbuilder
+            Trip Builder
           </Typography>
-
+          <Box sx={{ flex: 1 }} />
           {!hideButton && (
-            <Stack direction="row" spacing={2}>
-              {!selectedLocationsToShare.length && (
-                <TBButton
-                  variant="outline"
-                  type="button"
-                  onClick={onSwitchToMap}
-                  disabled={selectedLocationsToShare.length > 0}
-                  sx={styles.button(selectedLocationsToShare.length > 0)}
-                  leftIcon={<Map />}
-                >
-                  Bản đồ {isNewMap ? "mới" : "cũ"}
-                </TBButton>
-              )}
-            </Stack>
+            <TBButton
+              variant="outline"
+              size="small"
+              leftIcon={<Map size={18} />}
+              onClick={onSwitchToMap}
+            >
+              Bản đồ
+            </TBButton>
           )}
         </Toolbar>
       </AppBar>
-
+      {/* Giữ đúng chiều cao Toolbar để nội dung không bị AppBar fixed che */}
+      <Toolbar sx={{ minHeight: { xs: 56, sm: 64 } }} />
       <Box component="main" sx={styles.main}>
         <Container maxWidth={false} sx={styles.container}>
           {children}
         </Container>
       </Box>
-
       {open && <TBModal />}
-
       <Backdrop sx={styles.backdrop} open={isLoading}>
         <Stack alignItems="center" spacing={2}>
           <CircularProgress color="warning" />
@@ -138,7 +135,6 @@ export default function TBMainLayout({
           )}
         </Stack>
       </Backdrop>
-
       <TBToast
         isShow={isShow}
         message={message}

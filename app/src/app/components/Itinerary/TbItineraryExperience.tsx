@@ -14,16 +14,19 @@ export type Experience = {
   // type: "activity" | "food" | "place";
   address?: string;
   objectId?: string;
+  coordinates?: string;
 };
 
 type TbItineraryExperienceProps = {
   data?: Experience;
   onChange?: (data: Experience) => void;
+  onClickXButton?: () => void;
 };
 
 export default function TbItineraryExperience({
   data,
   onChange,
+  onClickXButton,
 }: TbItineraryExperienceProps) {
   const [value, setValue] = useState<string>("");
   const [location, setLocation] = useState<LookupItem | null>(null);
@@ -35,11 +38,11 @@ export default function TbItineraryExperience({
       showError("Trường hoạt động, điểm tham quan không được trống");
       return;
     }
-    console.log("locationInput", locationInput);
     onChange?.({
       name: value,
       address: location ? location.label : locationInput ? locationInput : "",
       objectId: data ? data.objectId : Utils.random.uuid(),
+      coordinates: location ? JSON.parse(location.value) : [],
     });
     onReset();
   };
@@ -64,18 +67,22 @@ export default function TbItineraryExperience({
 
   return (
     <Stack direction="column" spacing={3}>
-      <TBInput
-        type="text"
-        placeholder="Thêm hoạt động, điểm tham quan"
-        onChange={handleInputChange}
-        value={value}
-        variant="standard"
-      />
-      <TbLocationSearch
-        variant="standard"
-        onChange={(selected) => handleLocationChange(selected)}
-        onInputChange={(text) => handleInputLocationChange(text)}
-      />
+      <>
+        <TBInput
+          type="text"
+          placeholder="Thêm hoạt động, điểm tham quan"
+          onChange={handleInputChange}
+          value={value}
+          variant="standard"
+          autoFocus={true}
+        />
+        <TbLocationSearch
+          variant="standard"
+          onChange={(selected) => handleLocationChange(selected)}
+          onInputChange={(text) => handleInputLocationChange(text)}
+        />
+      </>
+
       <Box
         sx={{
           display: "flex",
@@ -86,9 +93,9 @@ export default function TbItineraryExperience({
         <TBIconButton type="button" onClick={handleChange}>
           <PlusCircle size={20} />
         </TBIconButton>
-        {/* <TBIconButton type="button">
+        <TBIconButton type="button" onClick={onClickXButton}>
           <XCircle size={20} />
-        </TBIconButton> */}
+        </TBIconButton>
       </Box>
     </Stack>
   );

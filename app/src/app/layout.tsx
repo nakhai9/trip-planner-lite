@@ -1,12 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import type { Viewport } from "next";
-import "@fontsource/roboto/400.css";
-import "@fontsource/roboto/500.css";
-import "./globals.scss";
-import TBMainLayout from "@/app/components/layout/TBMainLayout";
 import { TBProviders } from "@/app/providers";
-
+// import "leaflet/dist/leaflet.css";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -34,6 +30,12 @@ export default function TBRootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link
+          rel="stylesheet"
+          href="https://unpkg.com/leaflet@1.0.1/dist/leaflet.css"
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

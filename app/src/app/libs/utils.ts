@@ -1,3 +1,7 @@
+import dayjs, { Dayjs } from "dayjs";
+import { DATE_FORMAT } from "./constants";
+import { format } from "path";
+
 export const Utils = {
   object: {
     isEmpty: (obj: object): boolean => {
@@ -20,6 +24,12 @@ export const Utils = {
       date.setDate(date.getDate() + 1);
 
       return date.toISOString().split("T")[0];
+    },
+    formatStringToDayjs: (dateStr: string) => {
+      return dayjs(dateStr);
+    },
+    formatDayjsToString: (date: string) => {
+      return dayjs(date).format(DATE_FORMAT);
     },
   },
 };

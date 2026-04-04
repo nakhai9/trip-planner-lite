@@ -4,34 +4,13 @@ const PlanSchema = new mongoose.Schema({
     title: {
         type: String,
     },
-    startAt: {
+    startDate: {
         type: String,
         default: null
     },
-    description: {
+    endDate: {
         type: String,
         default: null
-    },
-    destinations: {
-        type: [
-            {
-                codeName: String,
-                activities: {
-                    type: [
-                        {
-                            name: String,
-                            address: {
-                                type: String,
-                                default: null
-                            }
-                        }
-                    ]
-                },
-                day: Number,
-                name: String
-            }
-        ],
-        default: []
     },
     isPublic: {
         type: Boolean,
@@ -43,7 +22,11 @@ const PlanSchema = new mongoose.Schema({
     },
     userId: {
         type:String
-    }
+    },
+    schedule: [{
+        day: Number,
+        destinations: []
+    }]
 }, {
     versionKey: false,
     timestamps: true

@@ -6,6 +6,7 @@ import type { TextFieldProps } from "@mui/material/TextField";
 
 export type TBInputProps = TextFieldProps & {
   containerClassName?: string;
+  onIconClick?: () => void;
 };
 
 export default function TBInput({
@@ -18,7 +19,6 @@ export default function TBInput({
   return (
     <TextField
       fullWidth
-      size="small"
       label={label}
       required={required}
       className={containerClassName}

@@ -23,7 +23,10 @@ const create = async (req, res) => {
         res.status(201).json(Response({
             code: "success",
             data: {
-                id: plan?.id || ""
+                id: plan?.id || "",
+                title: plan?.title || "",
+                startDate: plan?.startDate || null,
+                endDate: plan?.endDate || null,
             },
             message: "Created successfully"
         }));
@@ -47,14 +50,13 @@ const get = async (req, res) => {
             });
         }
 
-        const { _id, destinations, isPublic, accessCode: planAccessCode, ...rest } = plan;
+        const { _id, isPublic, accessCode: planAccessCode, ...rest } = plan;
 
         if (isPublic) {
             return res.status(200).json({
                 success: true,
                 data: {
                     id: _id,
-                    destinations,
                     ...rest,
                     canView: true,
                 },
@@ -83,7 +85,6 @@ const get = async (req, res) => {
             success: true,
             data: {
                 id: _id,
-                destinations,
                 ...rest,
                 canView: true,
             },
