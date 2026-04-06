@@ -4,7 +4,6 @@ import { useState } from "react";
 
 import QRCode from "qrcode";
 import dayjs, { Dayjs } from "dayjs";
-import { ItineraryLocation } from "@/components/Itinerary/TbItinerary";
 import { useGlobalStore, useToast } from "@/store/global-store";
 import { useRouter } from "next/navigation";
 import { HttpClient } from "@/libs/api/http";
@@ -22,7 +21,6 @@ import { DATE_FORMAT } from "@/libs/constants";
 import TbDateRangePicker, {
   TbDateRangePickerEvent,
 } from "@/components/ui/TbDateRangePicker";
-import { start } from "repl";
 
 type TripData = {
   id?: string;
@@ -32,11 +30,6 @@ type TripData = {
   endDate: Dayjs | null;
   accessCode?: string;
   isPrivate: boolean;
-};
-
-type TBTripDay = {
-  day: number;
-  destinations: ItineraryLocation[];
 };
 
 export default function TBCreateTripPlanPage() {

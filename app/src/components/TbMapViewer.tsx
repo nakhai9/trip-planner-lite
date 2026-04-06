@@ -1,8 +1,8 @@
 "use client";
-import { LocationInfo } from "@/app/model";
 import { Box } from "@mui/material";
 import "leaflet/dist/leaflet.css";
 import TbVietnamMap from "./TbVietnamMap";
+import { LocationInfo } from "@/types/common";
 type TbMapViewerProps = {
   locations: LocationInfo[];
   onChoose?: (location: LocationInfo) => void;

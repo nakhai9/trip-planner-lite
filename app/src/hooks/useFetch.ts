@@ -1,5 +1,5 @@
+import { ApiResponse } from "@/types/api";
 import { useCallback, useEffect, useState } from "react";
-import { ApiResponse } from "../libs/api/api.models";
 
 type FetchOption = {
   [key: string]: any;

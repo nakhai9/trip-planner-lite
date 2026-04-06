@@ -5,7 +5,7 @@ import { useVietnamMapStore } from "../store/vietnam-map-store";
 import useMousePosition from "../hooks/useMousePosition";
 import { Box } from "@mui/material";
 import { hexWithAlpha, TB_COLORS } from "@/libs/colors";
-import { LocationInfo, LocationModel } from "@/app/model";
+import { LocationInfo, LocationModel } from "@/types/common";
 
 type TbVietnamMapProps = {
   locationIds?: string[];
