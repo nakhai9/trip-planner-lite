@@ -1,6 +1,5 @@
 "use client";
 
-import { LocationInfo } from "@/app/model";
 import TbMainLayout from "@/components/layout/TbMainLayout";
 import TbMapViewer from "@/components/TbMapViewer";
 import TbSocialShare from "@/components/TbSocialShare";
