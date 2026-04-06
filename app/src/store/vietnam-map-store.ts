@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { OLD_VIETNAM_MAP } from "../data/old-vietnam-map";
 import { NEW_VIETNAM_MAP } from "../data/new-vietnam-map";
-import { LocationInfo } from "@/app/model";
+import { LocationInfo } from "@/types/common";
 
 type VietnamMapStore = {
   isNewMap: boolean;

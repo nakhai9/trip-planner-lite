@@ -1,4 +1,4 @@
-import { LocationInfo } from "@/app/model";
+import { LocationInfo } from "@/types/common";
 import { GoogleGenAI } from "@google/genai";
 
 const initPrompt = (
