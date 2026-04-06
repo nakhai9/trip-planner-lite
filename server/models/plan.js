@@ -5,12 +5,12 @@ const PlanSchema = new mongoose.Schema({
         type: String,
     },
     startDate: {
-        type: String,
-        default: null
+        type: Date,
+        required: true
     },
     endDate: {
-        type: String,
-        default: null
+        type: Date,
+        required: true
     },
     isPublic: {
         type: Boolean,
@@ -23,10 +23,6 @@ const PlanSchema = new mongoose.Schema({
     userId: {
         type:String
     },
-    schedule: [{
-        day: Number,
-        destinations: []
-    }]
 }, {
     versionKey: false,
     timestamps: true

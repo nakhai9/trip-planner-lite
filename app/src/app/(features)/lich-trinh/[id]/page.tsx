@@ -1,42 +1,32 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-
-import TBMainLayout from "@/app/components/layout/TBMainLayout";
-import TBTabs, { type TBTab } from "@/app/components/ui/TBTabs";
-import TbItineraryLocation from "@/app/components/Itinerary/TbItineraryLocation";
-import type { ItineraryLocation as TBDestinationV2Model } from "@/app/components/Itinerary/TbItineraryLocation";
-import TBButton from "@/app/components/ui/TBButton";
-import { Utils } from "@/app/libs/utils";
-import { InputAdornment, Paper, Skeleton } from "@mui/material";
-import TBInput from "@/app/components/ui/TBInput";
-import { Calendar1, Save } from "lucide-react";
-import { Box, Stack, Typography } from "@mui/material";
-import { useGlobalStore, useToast } from "@/app/store/global-store";
-import _ from "lodash";
-import { HttpClient } from "@/app/libs/api/axios";
-import { API_URLS } from "@/app/libs/api/api.constant";
-import { useParams, useRouter } from "next/navigation";
+import TbItinerary from "@/components/Itinerary/TbItinerary";
+import TbMainLayout from "@/components/layout/TbMainLayout";
+import TbButton from "@/components/ui/TbButton";
+import TbInput from "@/components/ui/TbInput";
+import TbTabs, { TbTab } from "@/components/ui/TbTabs";
+import { API_URLS } from "@/libs/api/api.constant";
+import { HttpClient } from "@/libs/api/http";
+import { DATE_FORMAT } from "@/libs/constants";
+import { NOOP_FNC, Utils, watch } from "@/libs/utils";
+import { useGlobalStore, useToast } from "@/store/global-store";
+import { ResponseId } from "@/types/api";
+import { ObjectId, Plan, Itinerary } from "@/types/common";
+import {
+  Box,
+  InputAdornment,
+  Paper,
+  Skeleton,
+  Stack,
+  Typography,
+} from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs, { Dayjs } from "dayjs";
-import { DATE_FORMAT } from "@/app/libs/constants";
-import dynamic from "next/dynamic";
 
-type TBTripData = {
-  title: string;
-  description: string;
-  startDate: string;
-  endDate: string;
-  accessCode: string;
-  isPrivate: boolean;
-  canView?: boolean;
-  schedule?: TBTripDay[];
-};
-
-type TBTripDay = {
-  day: number;
-  destinations: TBDestinationV2Model[];
-};
+import _ from "lodash";
+import { Calendar1, Save } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
+import { useState, useEffect, useCallback } from "react";
 
 const styles = {
   setupSite: {
@@ -53,7 +43,7 @@ const styles = {
     },
   },
 
-  scheduleSite: {
+  itinerariesSite: {
     sectionTitle: {
       my: 3,
       fontWeight: 400,
@@ -64,19 +54,19 @@ const styles = {
   },
 };
 
-type TBSetupSiteProps = {
-  tripData: TBTripData | null;
-  onSetupSiteChange?: (data: TBTripData) => void;
+type TbPlanInfoSiteProps = {
+  plan: Plan | null;
+  onPlanInfoChange?: (data: Plan) => void;
   handleStepChange?: (step: number) => void;
 };
 
-function TBSetUpSite({ tripData, onSetupSiteChange }: TBSetupSiteProps) {
+function TBPlanInfoSite({ plan, onPlanInfoChange }: TbPlanInfoSiteProps) {
   const { showError } = useToast();
 
-  const handleChange = (key: keyof TBTripData, value: any) => {
-    if (!tripData) return;
-    onSetupSiteChange?.({
-      ...tripData,
+  const handleChange = (key: keyof Plan, value: any) => {
+    if (!plan) return;
+    onPlanInfoChange?.({
+      ...plan,
       [key]: value,
     });
   };
@@ -94,7 +84,7 @@ function TBSetUpSite({ tripData, onSetupSiteChange }: TBSetupSiteProps) {
       {!isChangeName && (
         <Stack spacing={2}>
           <Box sx={{ display: "flex", minWidth: 0 }}>
-            {tripData?.title ? (
+            {plan?.title ? (
               <Typography
                 variant="h4"
                 component="h4"
@@ -104,7 +94,7 @@ function TBSetUpSite({ tripData, onSetupSiteChange }: TBSetupSiteProps) {
                   whiteSpace: "normal",
                 }}
               >
-                {tripData.title}
+                {plan.title}
               </Typography>
             ) : (
               <Skeleton width={200} />
@@ -116,10 +106,10 @@ function TBSetUpSite({ tripData, onSetupSiteChange }: TBSetupSiteProps) {
           </Box>
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
             <Calendar1 size={16} />
-            {tripData?.startDate && tripData?.endDate ? (
+            {plan?.startDate && plan?.endDate ? (
               <Typography variant="body1" component="h5">
-                {dayjs(tripData.startDate).format(DATE_FORMAT)} -{" "}
-                {dayjs(tripData.endDate).format(DATE_FORMAT)}
+                {dayjs(plan.startDate).format(DATE_FORMAT)} -{" "}
+                {dayjs(plan.endDate).format(DATE_FORMAT)}
               </Typography>
             ) : (
               <Stack direction="row" alignItems="center" spacing={1}>
@@ -132,10 +122,10 @@ function TBSetUpSite({ tripData, onSetupSiteChange }: TBSetupSiteProps) {
 
       {isChangeName && (
         <Stack spacing={5}>
-          <TBInput
+          <TbInput
             label="Tên hành trình"
             type="text"
-            value={tripData?.title || ""}
+            value={plan?.title || ""}
             size="medium"
             variant="standard"
             required
@@ -144,7 +134,7 @@ function TBSetUpSite({ tripData, onSetupSiteChange }: TBSetupSiteProps) {
             }
             onKeyDown={(e) => {
               if (e.key === "Enter") {
-                if (!tripData?.title.trim()) {
+                if (!plan?.title.trim()) {
                   showError("Tên hành trình không được để trống");
                   return;
                 }
@@ -160,7 +150,7 @@ function TBSetUpSite({ tripData, onSetupSiteChange }: TBSetupSiteProps) {
                     }}
                     position="end"
                     onClick={() => {
-                      if (!tripData?.title.trim()) {
+                      if (!plan?.title.trim()) {
                         showError("Tên hành trình không được để trống");
                         return;
                       }
@@ -177,7 +167,7 @@ function TBSetUpSite({ tripData, onSetupSiteChange }: TBSetupSiteProps) {
             <DatePicker
               label="Ngày bắt đầu"
               slotProps={{ textField: { size: "small", required: true } }}
-              defaultValue={dayjs(tripData?.startDate)}
+              defaultValue={dayjs(plan?.startDate)}
               onChange={(value: Dayjs | null) => {
                 const isBeforeToday = value?.isBefore(dayjs());
                 if (isBeforeToday) {
@@ -192,10 +182,10 @@ function TBSetUpSite({ tripData, onSetupSiteChange }: TBSetupSiteProps) {
             <DatePicker
               label="Ngày kết thúc"
               slotProps={{ textField: { size: "small", required: true } }}
-              defaultValue={dayjs(tripData?.startDate).add(1, "day")}
+              defaultValue={dayjs(plan?.startDate).add(1, "day")}
               onChange={(value: Dayjs | null) => {
                 if (!value) return;
-                const start = dayjs(tripData?.startDate, DATE_FORMAT);
+                const start = dayjs(plan?.startDate, DATE_FORMAT);
 
                 if (value.isBefore(start, "day")) {
                   showError("Ngày kết thúc không được trước ngày bắt đầu");
@@ -212,150 +202,80 @@ function TBSetUpSite({ tripData, onSetupSiteChange }: TBSetupSiteProps) {
   );
 }
 
-type TBScheduleSiteProps = {
-  schedule: TBTripDay[];
-  onScheduleChange: (data: TBTripDay[]) => void;
+type TbItinerariesSiteProps = {
+  itineraries: Itinerary[];
+  onItinerariesChange: (itineraries: Itinerary[]) => void;
   handleStepChange?: (step: number) => void;
 };
 
-function TBScheduleSite({
-  schedule = [],
-  onScheduleChange,
-  handleStepChange,
-}: TBScheduleSiteProps) {
+function TbItinerariesSite({
+  itineraries = [],
+  onItinerariesChange: onItineraryChange,
+}: TbItinerariesSiteProps) {
   const { showError } = useToast();
-  const [tabs, setTabs] = useState<TBTab[]>([{ key: "1", title: "Ngày 1" }]);
+  const [tabs, setTabs] = useState<TbTab[]>([{ key: "1", title: "Ngày 1" }]);
 
-  const [currentTab, setCurrentTab] = useState<TBTab>({
+  const [currentTab, setCurrentTab] = useState<TbTab>({
     key: "1",
     title: "Ngày 1",
   });
 
-  const currentDay = schedule.find((sh) => sh.day === Number(currentTab.key));
+  const handleItineraryChange = (
+    itineraryInfo: Itinerary,
+    action: "UPDATE" | "DELETE",
+  ) => {
+    const updated = itineraries.map((it) => {
+      if (it.objectId !== itineraryInfo.objectId) return it;
 
-  const destinations = currentDay?.destinations || [];
+      if (action === "DELETE") {
+        return {
+          ...it,
+          destination: {
+            codeName: "UNSET",
+            name: "UNSET",
+          },
+        };
+      }
 
-  const updateDay = (day: number, updater: (d: TBTripDay) => TBTripDay) => {
-    onScheduleChange?.(
-      schedule.map((item) => (item.day === day ? updater(item) : item)),
-    );
+      return {
+        ...it,
+        ...itineraryInfo,
+      };
+    });
+
+    onItineraryChange(updated);
   };
 
-  const handleAddTab = () => {
-    const scheduleAtCurrentDay = schedule.find(
-      (sh) => sh.day === Number(currentTab.key),
-    );
-
-    if (
-      scheduleAtCurrentDay?.destinations.some((x) => x.codeName === "UNSET") ||
-      !scheduleAtCurrentDay?.destinations.length
-    ) {
-      showError("Bạn cần lên lịch cho ngày hiện tại");
-      return;
-    }
-
-    const nextDay = schedule.length + 1;
-
-    const newTab = {
-      key: nextDay.toString(),
-      title: `Ngày ${nextDay}`,
-    };
-
-    setTabs((prev) => [...prev, newTab]);
-    setCurrentTab(newTab);
-
-    onScheduleChange([...schedule, { day: nextDay, destinations: [] }]);
-  };
-
-  const create = () => {
-    const day = Number(currentTab.key);
-
-    updateDay(day, (sh) =>
-      sh.destinations.length === 0
-        ? {
-            ...sh,
-            destinations: [
-              {
-                codeName: "UNSET",
-                name: "",
-                experiences: [],
-                objectId: Utils.random.uuid(),
-              },
-            ],
-          }
-        : sh,
-    );
-  };
-
-  const handleDestinationChange = (dest: TBDestinationV2Model, day: number) => {
-    updateDay(day, (item) => ({
-      ...item,
-      destinations: [dest],
-    }));
-  };
-
-  const handleDeleteDestination = (dest: { codeName: string }, day: number) => {
-    updateDay(day, (item) => ({
-      ...item,
-      destinations: item.destinations.filter(
-        (x) => x.codeName !== dest.codeName,
-      ),
-    }));
+  const handleAddStep = () => {
+    // onItineraryChange();
   };
 
   return (
     <>
-      <Box sx={{ my: 5 }}>
-        <TBTabs
-          tabs={tabs}
-          current={currentTab}
-          onAdd={handleAddTab}
-          onChooseTab={(tab) => setCurrentTab(tab)}
+      <Stack spacing={4} sx={{ my: 5 }}>
+        <Box>
+          <TbTabs
+            tabs={tabs}
+            current={currentTab}
+            onChooseTab={(tab) => setCurrentTab(tab)}
+            onAdd={() => handleAddStep}
+          />
+        </Box>
+
+        <TbItinerary
+          itinerary={
+            itineraries.find((x) => x.day === Number(currentTab.key)) || {
+              day: Number(currentTab.key),
+              destination: { codeName: "UNSET", name: "UNSET" },
+              activities: [],
+            }
+          }
+          onItineraryChange={(itinerary) =>
+            handleItineraryChange(itinerary, "UPDATE")
+          }
+          onDelete={(itinerary) => handleItineraryChange(itinerary, "DELETE")}
         />
-
-        {destinations.length === 0 && (
-          <Box
-            sx={{
-              mt: 4,
-              borderRadius: 1,
-              border: "2px dashed",
-              borderColor: "primary.main",
-              height: 100,
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              backgroundColor: "background.paper",
-            }}
-          >
-            <TBButton variant="outline" type="button" onClick={create}>
-              Thêm điểm đến
-            </TBButton>
-            {/* <TBButton
-              variant="outline"
-              type="button"
-              onClick={create}
-              leftIcon={<Sparkles size={14} />}
-            >
-              Đề xuất từ AI
-            </TBButton> */}
-          </Box>
-        )}
-
-        <Stack spacing={2} sx={styles.scheduleSite.list}>
-          {destinations.map((destination) => (
-            <TbItineraryLocation
-              key={destination.objectId || destination.id}
-              destination={destination}
-              onChangeDestination={(destination) =>
-                handleDestinationChange(destination, Number(currentTab.key))
-              }
-              onDelete={(destination) =>
-                handleDeleteDestination(destination, Number(currentTab.key))
-              }
-            />
-          ))}
-        </Stack>
-      </Box>
+      </Stack>
     </>
   );
 }
@@ -366,25 +286,26 @@ export default function TBTripBuilderPage() {
   const router = useRouter();
   const params = useParams();
   const id = params.id;
-  const [tripData, setTripData] = useState<TBTripData | null>(null);
+  const [plan, setPlan] = useState<Plan | null>(null);
 
-  const [schedule, setSchedule] = useState<TBTripDay[]>([
-    { day: 1, destinations: [] },
+  const [itineraries, setItineraries] = useState<Itinerary[]>([
+    {
+      day: 1,
+      destination: { codeName: "UNSET", name: "UNSET" },
+      activities: [],
+      objectId: Utils.random.uuid(),
+    },
   ]);
 
   const fetchPlan = useCallback(async () => {
     setIsLoading(true);
     try {
-      const data = await HttpClient.post<TBTripData>(API_URLS.plan + "/" + id);
+      const data = await HttpClient.post<Plan>(API_URLS.plan + "/" + id);
       if (!data) return;
-      const { schedule, canView, ...rest } = data;
-      setTripData(data);
-      if (schedule && !!schedule?.length) {
-        console.log("empty schedule");
-        setSchedule(schedule);
-      }
+      setPlan(data);
     } catch (error) {
       showError(error);
+      router.push("/");
     } finally {
       setIsLoading(false);
     }
@@ -392,40 +313,32 @@ export default function TBTripBuilderPage() {
 
   const handleSave = async () => {
     try {
-      if (!tripData?.title) {
+      if (!plan?.title) {
         showError("Bạn chưa đặt tên cho lịch trình");
         return;
       }
-
-      if (schedule.every((sh) => !sh.destinations.length)) {
+      if (itineraries.every((x) => x.destination.codeName === "UNSET")) {
         showError("Lịch trình chưa được lập");
         return;
       }
-
       setIsLoading(true);
 
-      const cleanedTrip = _.omit(tripData, ["objectId"]);
-
-      const cleanedSchedule = schedule.map((day) => ({
-        ...day,
-        destinations: day.destinations.map((dest) => ({
-          ..._.omit(dest, ["objectId"]),
-          experiences: dest.experiences.map((act) => _.omit(act, ["objectId"])),
-        })),
+      const cleanedItineraries = _.map(itineraries, (item) => ({
+        ..._.omit(item, ["objectId"]),
+        activities: _.map(item.activities, (act) => _.omit(act, ["objectId"])),
       }));
 
-      console.log({
-        ...tripData,
-        schedule: cleanedSchedule,
-      });
-
-      // const data = await HttpClient.post<ResponseId>(API_URLS.plan, {
-      //   ...tripData,
-      //   schedule: cleanedSchedule,
-      // });
-
-      // router.push("/lich-trinh/" + data.id);
-      // showSuccess("Tạo hành trình thành công");
+      const payload = {
+        planId: id,
+        itineraries: cleanedItineraries,
+      };
+      console.log(payload);
+      const data = await HttpClient.post<ResponseId>(
+        API_URLS.planItinerary,
+        payload,
+      );
+      router.push("/");
+      showSuccess("Cập nhật hành trình thành công");
     } catch (error) {
       showError(error);
     } finally {
@@ -441,27 +354,25 @@ export default function TBTripBuilderPage() {
   }, [id, fetchPlan]);
 
   return (
-    <TBMainLayout hideButton>
+    <TbMainLayout hideButton>
       <Stack spacing={4}>
-        <TBSetUpSite tripData={tripData} onSetupSiteChange={setTripData} />
-        <TBScheduleSite
-          schedule={schedule}
-          onScheduleChange={(schedule) => {
-            setSchedule(schedule);
+        <TBPlanInfoSite plan={plan} onPlanInfoChange={setPlan} />
+        <TbItinerariesSite
+          itineraries={itineraries}
+          onItinerariesChange={(itineraries) => {
+            setItineraries(itineraries);
           }}
         />
-        <TBButton
+        <TbButton
           type="button"
           onClick={handleSave}
-          disabled={schedule.every(
-            (sh) =>
-              !sh.destinations.length ||
-              sh.destinations.some((d) => d.codeName === "UNSET"),
+          disabled={itineraries.every(
+            (x) => x.destination.codeName === "UNSET",
           )}
         >
           Lưu
-        </TBButton>
+        </TbButton>
       </Stack>
-    </TBMainLayout>
+    </TbMainLayout>
   );
 }

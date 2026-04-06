@@ -1,14 +1,15 @@
 "use client";
-import TBMapViewer from "@/app/components/TBMapViewer";
-import TBSocialShare from "@/app/components/TBSocialShare";
-import { API_URLS } from "@/app/libs/api/api.constant";
-import { HttpClient } from "@/app/libs/api/axios";
+
 import { LocationInfo } from "@/app/model";
-import { useGlobalStore, useToast } from "@/app/store/global-store";
-import { useVietnamMapStore } from "@/app/store/vietnam-map-store";
-import TBMainLayout from "@/app/components/layout/TBMainLayout";
-import TBButton from "@/app/components/ui/TBButton";
-import TBIconButton from "@/app/components/ui/TBIconButton";
+import TbMainLayout from "@/components/layout/TbMainLayout";
+import TbMapViewer from "@/components/TbMapViewer";
+import TbSocialShare from "@/components/TbSocialShare";
+import TbButton from "@/components/ui/TbButton";
+import TbIconButton from "@/components/ui/TbIconButton";
+import { API_URLS } from "@/libs/api/api.constant";
+import { HttpClient } from "@/libs/api/http";
+import { useGlobalStore, useToast } from "@/store/global-store";
+import { useVietnamMapStore } from "@/store/vietnam-map-store";
 import {
   Dialog,
   DialogContent,
@@ -141,7 +142,7 @@ export default function TBChiaSeHinhAnhPage() {
   const upcomingColor = "#836FFF";
 
   return (
-    <TBMainLayout hideButton={false}>
+    <TbMainLayout hideButton={false}>
       <Stack sx={{ mt: 10, px: { xs: 2, md: 0 } }}>
         <Stack
           direction="row"
@@ -153,7 +154,7 @@ export default function TBChiaSeHinhAnhPage() {
           {selectedLocationsToShare.filter((x) => x.status === "UPCOMING")
             .length > 0 && (
             <Tooltip title="Tạo lịch trình">
-              <TBButton
+              <TbButton
                 onClick={() => navigateToPage("/lich-trinh")}
                 sx={{
                   "& svg": {
@@ -164,13 +165,13 @@ export default function TBChiaSeHinhAnhPage() {
                 leftIcon={<MapPinned />}
               >
                 Tạo lịch trình
-              </TBButton>
+              </TbButton>
             </Tooltip>
           )}
           {selectedLocationsToShare.length > 0 && (
             <>
               <Tooltip title="Tạo hình ảnh để chia sẻ">
-                <TBButton
+                <TbButton
                   onClick={onShareModal}
                   sx={{
                     "& svg": {
@@ -181,10 +182,10 @@ export default function TBChiaSeHinhAnhPage() {
                   leftIcon={<Share2 />}
                 >
                   Chia sẻ lên mạng xã hội
-                </TBButton>
+                </TbButton>
               </Tooltip>
               <Tooltip title="Khôi phục">
-                <TBButton
+                <TbButton
                   variant="outline"
                   onClick={resetSelectedLocationsToShare}
                   sx={{
@@ -200,7 +201,7 @@ export default function TBChiaSeHinhAnhPage() {
             </>
           )}
         </Stack>
-        <TBMapViewer
+        <TbMapViewer
           locations={selectedLocationsToShare}
           onChoose={(location) => handleChooseLocation(location)}
         />
@@ -222,13 +223,13 @@ export default function TBChiaSeHinhAnhPage() {
           <Typography fontWeight={500} variant="subtitle1">
             {modalName === "mark-modal" ? "Địa điểm" : "Chia sẻ hành trình"}
           </Typography>
-          <TBIconButton
+          <TbIconButton
             sx={{ color: "grey.700" }}
             onClick={() => setOpen(false)}
             aria-label="Đóng"
           >
             <X />
-          </TBIconButton>
+          </TbIconButton>
         </DialogTitle>
         <DialogContent sx={{ minWidth: 224 }}>
           {modalName === "mark-modal" && (
@@ -313,9 +314,9 @@ export default function TBChiaSeHinhAnhPage() {
             </Stack>
           )}
 
-          {modalName === "share-modal" && <TBSocialShare url={url} />}
+          {modalName === "share-modal" && <TbSocialShare url={url} />}
         </DialogContent>
       </Dialog>
-    </TBMainLayout>
+    </TbMainLayout>
   );
 }

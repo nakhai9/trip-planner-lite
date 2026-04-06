@@ -11,7 +11,7 @@ const provinceRouter = require("./routes/province")
 const svgVectorMapRouter = require("./routes/svgVectorMap");
 const planImageRouter = require("./routes/planImage");
 const checkHealthRouter = require("./routes/health");
-
+const planItineraryRouter = require('./routes/planItinerary')
 const app = express();
 
 // Middleware parse JSON
@@ -38,6 +38,7 @@ app.use("/api/plans", planRouter);
 app.use('/api/provinces', provinceRouter)
 app.use("/api/svg-vector-map", svgVectorMapRouter)
 app.use("/api/plan-images", planImageRouter)
+app.use("/api/plan-itineraries", planItineraryRouter)
 
 // Start server
 app.listen(process.env.PORT, () => {

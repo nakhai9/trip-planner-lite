@@ -1,10 +1,11 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import TBMainLayout from "@/app/components/layout/TBMainLayout";
-import TBButton from "@/app/components/ui/TBButton";
-import { useGlobalStore } from "@/app/store/global-store";
+
 import { Card, CardContent, Stack, Typography } from "@mui/material";
+import { useGlobalStore } from "@/store/global-store";
+import TbMainLayout from "@/components/layout/TbMainLayout";
+import TbButton from "@/components/ui/TbButton";
 
 export default function TBHomePage() {
   const router = useRouter();
@@ -18,7 +19,7 @@ export default function TBHomePage() {
   };
 
   return (
-    <TBMainLayout hideButton={true}>
+    <TbMainLayout hideButton={true}>
       <Stack
         direction={{ xs: "column", md: "row" }}
         spacing={3}
@@ -39,14 +40,14 @@ export default function TBHomePage() {
             sx={{ display: "flex", flexDirection: "column", gap: 1 }}
           >
             <Typography color="primary" fontWeight={500} variant="h6">
-              Tạo hành trình
+              Tạo lịch trình
             </Typography>
             <Typography variant="body2" sx={{ minHeight: 64 }}>
               Dễ dàng lên kế hoạch cá nhân/nhóm cho những chuyến du lịch
             </Typography>
-            <TBButton onClick={() => navigateToPage("/lich-trinh")}>
+            <TbButton onClick={() => navigateToPage("/tao-lich-trinh-moi")}>
               Bắt đầu
-            </TBButton>
+            </TbButton>
           </CardContent>
         </Card>
         <Card
@@ -67,12 +68,12 @@ export default function TBHomePage() {
             <Typography variant="body2" sx={{ minHeight: 64 }}>
               Tạo và chia sẻ hành trình những nơi đã đi qua dưới dạng hình ảnh
             </Typography>
-            <TBButton onClick={() => navigateToPage("/chia-se-hinh-anh")}>
+            <TbButton onClick={() => navigateToPage("/chia-se-hinh-anh")}>
               Bắt đầu
-            </TBButton>
+            </TbButton>
           </CardContent>
         </Card>
       </Stack>
-    </TBMainLayout>
+    </TbMainLayout>
   );
 }

@@ -2,39 +2,41 @@
 
 import { useState } from "react";
 
-import TBMainLayout from "@/app/components/layout/TBMainLayout";
-import type { ItineraryLocation as TBDestinationV2Model } from "@/app/components/Itinerary/TbItineraryLocation";
-import TBButton from "@/app/components/ui/TBButton";
-import { Utils } from "@/app/libs/utils";
-import { Paper } from "@mui/material";
-import TBInput from "@/app/components/ui/TBInput";
-import { Calendar1, ExternalLink, NotebookPen, Share2 } from "lucide-react";
-import { Box, Stack, Typography } from "@mui/material";
-import { useGlobalStore, useToast } from "@/app/store/global-store";
-import _ from "lodash";
-import TBIconButton from "@/app/components/ui/TBIconButton";
-import { HttpClient } from "@/app/libs/api/axios";
-import { API_URLS } from "@/app/libs/api/api.constant";
-import { useRouter } from "next/navigation";
-import { ResponseId } from "@/app/libs/api/api.models";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import dayjs, { Dayjs } from "dayjs";
-import { DATE_FORMAT } from "@/app/libs/constants";
 import QRCode from "qrcode";
+import dayjs, { Dayjs } from "dayjs";
+import { ItineraryLocation } from "@/components/Itinerary/TbItinerary";
+import { useGlobalStore, useToast } from "@/store/global-store";
+import { useRouter } from "next/navigation";
+import { HttpClient } from "@/libs/api/http";
+import { ResponseId } from "@/types/api";
+import { API_URLS } from "@/libs/api/api.constant";
+import TbMainLayout from "@/components/layout/TbMainLayout";
+import { Box, Paper, Stack, Typography } from "@mui/material";
+import TbInput from "@/components/ui/TbInput";
 
-type TBTripData = {
+import TbButton from "@/components/ui/TbButton";
+import { Calendar1, ExternalLink, NotebookPen, Share2 } from "lucide-react";
+import TbIconButton from "@/components/ui/TbIconButton";
+
+import { DATE_FORMAT } from "@/libs/constants";
+import TbDateRangePicker, {
+  TbDateRangePickerEvent,
+} from "@/components/ui/TbDateRangePicker";
+import { start } from "repl";
+
+type TripData = {
   id?: string;
   title: string;
   description: string;
-  startDate: Dayjs;
-  endDate: Dayjs;
+  startDate: Dayjs | null;
+  endDate: Dayjs | null;
   accessCode?: string;
   isPrivate: boolean;
 };
 
 type TBTripDay = {
   day: number;
-  destinations: TBDestinationV2Model[];
+  destinations: ItineraryLocation[];
 };
 
 export default function TBCreateTripPlanPage() {
@@ -42,15 +44,15 @@ export default function TBCreateTripPlanPage() {
   const { setIsLoading } = useGlobalStore();
   const router = useRouter();
   const [qrCodeUrl, setQrCodeUrl] = useState("");
-  const [tripData, setTripData] = useState<TBTripData>({
+  const [tripData, setTripData] = useState<TripData>({
     title: "",
     description: "",
-    startDate: dayjs(),
-    endDate: dayjs().add(1, "day"),
+    startDate: dayjs().add(1, "day"),
+    endDate: dayjs().add(2, "day"),
     accessCode: "",
     isPrivate: false,
   });
-  const [createdPlan, setCreatedPlan] = useState<TBTripData | null>(null);
+  const [createdPlan, setCreatedPlan] = useState<TripData | null>(null);
 
   const getQrCodeUrl = async (id: string) => {
     return await QRCode.toDataURL(`${window.location.origin}/lich-trinh/${id}`);
@@ -61,11 +63,37 @@ export default function TBCreateTripPlanPage() {
     setQrCodeUrl(url);
   };
 
-  const handleChange = (key: keyof TBTripData, value: any) => {
-    setTripData((prev) => ({
-      ...prev,
-      [key]: value,
-    }));
+  const handleChange = (key: keyof TripData, value: any) => {
+    setTripData((prev) => {
+      return {
+        ...prev,
+        [key]: value,
+      };
+    });
+  };
+
+  const handleDateChange = (e: TbDateRangePickerEvent) => {
+    handleChange("startDate", e.from);
+
+    const isBeforeToday = dayjs(e.from)?.isBefore(dayjs());
+    if (isBeforeToday) {
+      showError("Ngày bắt đầu không được ở quá khứ");
+      return;
+    }
+    handleChange("startDate", e.from || "");
+
+    if (!e.to) return;
+    const start = dayjs(e.from);
+
+    if (
+      dayjs(e.to).isBefore(start, "day") ||
+      dayjs(e.to).isBefore(dayjs(), "day")
+    ) {
+      showError("Ngày kết thúc không được trước ngày bắt đầu hoặc ở quá khứ");
+      return;
+    }
+
+    handleChange("endDate", e.to);
   };
 
   const handleSave = async () => {
@@ -80,6 +108,8 @@ export default function TBCreateTripPlanPage() {
 
       const data = await HttpClient.post<ResponseId>(API_URLS.plan, {
         ...tripData,
+        startDate: dayjs(tripData.startDate).toISOString(),
+        endDate: dayjs(tripData.endDate).toISOString(),
       });
       setCreatedPlan({ ...tripData, id: data.id });
       genQRCode(data.id);
@@ -96,8 +126,8 @@ export default function TBCreateTripPlanPage() {
     setTripData({
       title: "",
       description: "",
-      startDate: dayjs(),
-      endDate: dayjs().add(1, "day"),
+      startDate: null,
+      endDate: null,
       accessCode: undefined,
       isPrivate: false,
     });
@@ -111,7 +141,7 @@ export default function TBCreateTripPlanPage() {
   };
 
   return (
-    <TBMainLayout hideButton>
+    <TbMainLayout hideButton>
       <Paper
         sx={{
           mt: "40px !important",
@@ -134,7 +164,7 @@ export default function TBCreateTripPlanPage() {
                 Tạo lịch trình mới để trải nghiệm chuyến đi của bạn
               </Typography>
               <Stack spacing={6}>
-                <TBInput
+                <TbInput
                   label="Tên hành trình"
                   type="text"
                   value={tripData.title || ""}
@@ -156,54 +186,22 @@ export default function TBCreateTripPlanPage() {
                     }
                   }}
                 />
-                <Stack flexDirection="row" alignItems="center" gap={2}>
-                  <DatePicker
-                    label="Ngày bắt đầu"
-                    slotProps={{ textField: { size: "small", required: true } }}
-                    defaultValue={dayjs(tripData.startDate)}
-                    onChange={(value: Dayjs | null) => {
-                      const isBeforeToday = value?.isBefore(dayjs());
-                      if (isBeforeToday) {
-                        showError(
-                          "Ngày bắt đầu không được trước ngày hiện tại",
-                        );
-                        return;
-                      }
-                      handleChange(
-                        "startDate",
-                        value?.format(DATE_FORMAT) || "",
-                      );
-                    }}
-                    format={DATE_FORMAT}
-                  />
-                  đến
-                  <DatePicker
-                    label="Ngày kết thúc"
-                    slotProps={{ textField: { size: "small", required: true } }}
-                    defaultValue={dayjs(tripData.endDate)}
-                    onChange={(value: Dayjs | null) => {
-                      if (!value) return;
-                      const start = dayjs(tripData.startDate, DATE_FORMAT);
-
-                      if (value.isBefore(start, "day")) {
-                        showError(
-                          "Ngày kết thúc không được trước ngày bắt đầu",
-                        );
-                        return;
-                      }
-                      handleChange("endDate", value?.format(DATE_FORMAT) || "");
-                    }}
-                    format={DATE_FORMAT}
-                  />
-                </Stack>
+                <TbDateRangePicker
+                  from={tripData.startDate || undefined}
+                  to={tripData.endDate || undefined}
+                  fromTitle="Bắt đầu"
+                  toTitle="Kết thúc"
+                  format={DATE_FORMAT}
+                  onDateChange={(e) => handleDateChange(e)}
+                />
                 <Stack
                   flexDirection="row"
                   justifyContent="flex-end"
                   alignItems="center"
                 >
-                  <TBButton type="button" onClick={handleSave}>
+                  <TbButton type="button" onClick={handleSave}>
                     Lưu
-                  </TBButton>
+                  </TbButton>
                 </Stack>
               </Stack>
             </>
@@ -215,8 +213,8 @@ export default function TBCreateTripPlanPage() {
               <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                 <Calendar1 size={16} />
                 <Typography variant="body1" component="h5">
-                  {createdPlan.startDate.format(DATE_FORMAT)} -{" "}
-                  {createdPlan.endDate.format(DATE_FORMAT) || "?"}
+                  {dayjs(createdPlan.startDate).format(DATE_FORMAT)} -{" "}
+                  {dayjs(createdPlan.endDate).format(DATE_FORMAT)}
                 </Typography>
               </Box>
               {qrCodeUrl && (
@@ -242,17 +240,17 @@ export default function TBCreateTripPlanPage() {
                   alignItems="center"
                   gap={1}
                 >
-                  <TBIconButton onClick={copyToShare}>
+                  <TbIconButton onClick={copyToShare}>
                     <Share2 size={20} />
-                  </TBIconButton>
-                  <TBIconButton>
+                  </TbIconButton>
+                  <TbIconButton>
                     <NotebookPen size={20} />
-                  </TBIconButton>
-                  <TBIconButton
+                  </TbIconButton>
+                  <TbIconButton
                     onClick={() => router.push(`/lich-trinh/${createdPlan.id}`)}
                   >
                     <ExternalLink size={20} />
-                  </TBIconButton>
+                  </TbIconButton>
                 </Stack>
                 <Box></Box>
               </Box>
@@ -260,6 +258,6 @@ export default function TBCreateTripPlanPage() {
           )}
         </Stack>
       </Paper>
-    </TBMainLayout>
+    </TbMainLayout>
   );
 }
