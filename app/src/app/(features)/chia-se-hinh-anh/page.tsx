@@ -9,6 +9,7 @@ import { API_URLS } from "@/libs/api/api.constant";
 import { HttpClient } from "@/libs/api/http";
 import { useGlobalStore, useToast } from "@/store/global-store";
 import { useVietnamMapStore } from "@/store/vietnam-map-store";
+import { LocationInfo } from "@/types/common";
 import {
   Dialog,
   DialogContent,
